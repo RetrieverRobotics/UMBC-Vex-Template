@@ -185,4 +185,4 @@ class VController : public Controller {
 };
 }
 
-#endif _UMBC_VCONTROLLER_HPP_
+#endif // _UMBC_VCONTROLLER_HPP_
