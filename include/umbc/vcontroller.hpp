@@ -6,8 +6,8 @@
  * controller inputs.
  */
 
-#ifndef _UMBC_VCONTROLLER_HPP_
-#define _UMBC_VCONTROLLER_HPP_
+#ifndef _UMBC_V_CONTROLLER_HPP_
+#define _UMBC_V_CONTROLLER_HPP_
 
 #include "pros/misc.hpp"
 
@@ -185,4 +185,4 @@ class VController : public Controller {
 };
 }
 
-#endif // _UMBC_VCONTROLLER_HPP_
+#endif // _UMBC_V_CONTROLLER_HPP_
