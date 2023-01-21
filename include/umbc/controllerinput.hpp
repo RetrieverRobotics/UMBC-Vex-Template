@@ -8,11 +8,12 @@
 #ifndef _UMBC_CONTROLLER_INPUT_HPP_
 #define _UMBC_CONTROLLER_INPUT_HPP_
 
-#include "pros/misc.hpp"
+#include "api.h"
 
 #include <cstdint>
 
 using namespace pros;
+using namespace std;
 
 namespace umbc {
 typedef enum {
