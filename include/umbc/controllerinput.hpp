@@ -1,5 +1,5 @@
 /**
- * \file umbc/vcontroller.hpp
+ * \file umbc/controllerinput.hpp
  *
  * Contains the prototype for the ControllerInput. ControllerInput
  * stores controller values with a minimal memory footprint.
@@ -15,6 +15,11 @@
 using namespace pros;
 
 namespace umbc {
+typedef enum {
+    E_CONTROLLER_ANALOG_MIN = -127,
+    E_CONTROLLER_ANALOG_MAX = 127
+} controller_analog_e_limit_t;
+
 class ControllerInput {
 
     private:
@@ -81,7 +86,7 @@ class ControllerInput {
     void set_analog(controller_analog_e_t channel, std::int32_t value);
 
     /**
-	 * Gets the value of a digital input (button).
+	 * Sets the value of a digital input (button).
 	 *
 	 * \param button
 	 *      The digital input value to set. Must be one of
