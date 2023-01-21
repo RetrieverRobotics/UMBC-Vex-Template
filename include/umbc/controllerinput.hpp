@@ -65,6 +65,34 @@ class ControllerInput {
 	 */
     std::int32_t get_digital(controller_digital_e_t button);
 
+    /**
+	 * Sets the value of an analog input (joystick).
+	 *
+	 * \param channel
+	 * 			  The analog input value to set.
+	 * 			  Must be one of ANALOG_LEFT_X, ANALOG_LEFT_Y, ANALOG_RIGHT_X,
+	 *        ANALOG_RIGHT_Y
+	 *
+	 * \param value
+     *          The value for the analog input. Must be [-127, 127]. Values
+     *          lower than -127 will be converted to -127, and values higher
+     *          than 127 will be converted to 127.
+	 */
+    void set_analog(controller_analog_e_t channel, std::int32_t value);
+
+    /**
+	 * Gets the value of a digital input (button).
+	 *
+	 * \param button
+	 *      The digital input value to set. Must be one of
+	 *      DIGITAL_{RIGHT,DOWN,LEFT,UP,A,B,Y,X,R1,R2,L1,L2}
+	 *
+	 * \param value
+     *      The value for the digital input. Must be 0 or 1. Non-zero numbers
+     *      will be converted to 1.
+	 */
+    void set_digital(controller_digital_e_t button, std::int32_t value);
+
 };
 }
 
