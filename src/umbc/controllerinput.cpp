@@ -11,8 +11,8 @@
 #include <cstdint>
 
 using namespace pros;
+using namespace umbc;
 
-namespace umbc {
 umbc::ControllerInput::ControllerInput() { 
 
     this->digital_l1 = 0;
@@ -152,6 +152,4 @@ void umbc::ControllerInput::set_digital(controller_digital_e_t button, std::int3
         default:
             return;
     }
-}
-
 }
