@@ -25,7 +25,7 @@ class VController : public Controller {
 	std::uint16_t poll_rate_ms;
 	std::queue<ControllerInput> controller_input;
 
-	Task t_update_controller_input;
+	Task* t_update_controller_input;
 
 	/**
 	 * Pops off the front of the controllerinput queue at the set poll rate.
