@@ -42,10 +42,10 @@ class VController : public Controller {
     /**
 	 * Checks if the controller is connected.
 	 *
-	 * Connected for the virtual controller means that the controller
-	 * input vector is populated in order to emulate controller input.
+	 * Connected for the virtual controller means that the controller input queue
+	 * is not empty.
 	 *
-	 * \return 0 if the controller input vector is empty, otherwise 1
+	 * \return 0 if the controller input queue is empty, otherwise 1
 	 */
 	std::int32_t is_connected(void);
 
@@ -251,6 +251,11 @@ class VController : public Controller {
 	 * input queue.
 	 */
 	void stop(void);
+
+	/**
+	 * Wait for the update controller input task to complete.
+	 */
+	void wait_till_complete(void);
 };
 }
 
