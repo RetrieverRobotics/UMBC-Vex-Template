@@ -22,15 +22,23 @@ namespace umbc {
 class VController : public Controller {
 
 	private:
-	std::uint16_t poll_rate_ms;
-	std::queue<ControllerInput> controller_input;
+	const char* t_update_controller_input_name = "vcontroller";
 
-	Task* t_update_controller_input;
+	std::uint16_t poll_rate_ms;
+	std::unique_ptr<std::queue<ControllerInput>> controller_input;
+	std::unique_ptr<Task> t_update_controller_input;
 
 	/**
-	 * Pops off the front of the controllerinput queue at the set poll rate.
+	 * Pops off the front of the controller input queue at the set poll rate.
+	 * 
+	 * This function is intended to be used as a task, which is why it is
+	 * static.
+	 * 
+	 * \param VController
+	 * 			The virtual controller whos inputs will be updated. The type for
+	 * 			this parameter must be VController. Intended to be 'this' pointer.
 	 */
-	std::int32_t update();
+	static void update(void* VController);
 
     public:
 
@@ -216,6 +224,13 @@ class VController : public Controller {
 	std::int32_t clear(void);
 
 	/**
+	 * Returns the rate in milliseconds the controller inputs are updated.
+	 * 
+	 * \return The rate in millisconds te controller inputs are updated.
+	 */
+	std::int32_t get_poll_rate_ms();
+
+	/**
 	 * Reads a controller input file, saves the poll rate, and loads the
 	 * controller inputs from the file into a queue.
 	 * 
@@ -232,7 +247,7 @@ class VController : public Controller {
 	 * Creates a seperate task that pops off the front of the controller
 	 * input queue at the set poll rate.
 	 */
-	std::int32_t start(void);
+	void start(void);
 
 	/**
 	 * Pauses popping off the front of the controller input queue at the

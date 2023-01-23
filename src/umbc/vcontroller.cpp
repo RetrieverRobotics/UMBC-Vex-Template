@@ -13,21 +13,43 @@
 
 using namespace pros;
 using namespace umbc;
+using namespace std;
 
 umbc::VController::VController():Controller(E_CONTROLLER_MASTER) {
 
+    this->poll_rate_ms = 0;
+    this->controller_input.reset(new std::queue<ControllerInput>());
+    this->t_update_controller_input.reset(nullptr);
 }
 
-std::int32_t umbc::VController::update() {
+void umbc::VController::update(void* vcontroller) {
 
+    umbc::VController* controller = (umbc::VController*)vcontroller;
+
+    while (!controller->controller_input.get()->empty()) {
+        delay(controller->get_poll_rate_ms());
+        controller->controller_input.get()->pop();
+    }
 }
 
 std::int32_t umbc::VController::is_connected() {
 
+    std::queue<ControllerInput>* controller_input = this->controller_input.get();
+
+    if (controller_input == nullptr || controller_input->empty()) {
+        return 0;
+    }
+    return 1;
 }
 
 std::int32_t umbc::VController::get_analog(controller_analog_e_t channel) {
 
+    std::queue<ControllerInput>* controller_input = this->controller_input.get();
+
+    if (controller_input == nullptr || controller_input->empty()) {
+        return 0;
+    }
+    return controller_input->front().get_analog(channel);
 }
 
 std::int32_t umbc::VController::get_battery_capacity() {
@@ -40,6 +62,12 @@ std::int32_t umbc::VController::get_battery_level() {
 
 std::int32_t umbc::VController::get_digital(controller_digital_e_t button) {
 
+    std::queue<ControllerInput>* controller_input = this->controller_input.get();
+
+    if (controller_input == nullptr || controller_input->empty()) {
+        return 0;
+    }
+    return controller_input->front().get_digital(button);
 }
 
 std::int32_t umbc::VController::get_digital_new_press(controller_digital_e_t button) {
@@ -66,30 +94,56 @@ std::int32_t umbc::VController::clear() {
     return 1;
 }
 
+std::int32_t umbc::VController::get_poll_rate_ms() {
+    return this->poll_rate_ms;
+}
+
 std::int32_t umbc::VController::load(const char* file_path) {
 
 }
 
 std::int32_t umbc::VController::load(std::string& file_path) {
-
+    return this->load(file_path.c_str());
 }
 
-std::int32_t umbc::VController::start() {
+void umbc::VController::start() {
 
+    this->t_update_controller_input.reset(
+        new Task((task_fn_t)this->update, (void*)this, this->t_update_controller_input_name));
 }
 
 void umbc::VController::pause() {
 
+    Task* t_update = this->t_update_controller_input.get();
+
+    if (t_update != nullptr) {
+        t_update->suspend();
+    }
 }
 
 void umbc::VController::resume() {
 
+    Task* t_update = this->t_update_controller_input.get();
+
+    if (t_update != nullptr) {
+        t_update->resume();
+    }
 }
 
 void umbc::VController::stop() {
 
+    Task* t_update = this->t_update_controller_input.get();
+
+    if (t_update != nullptr) {
+        t_update->remove();
+    }
 }
 
 void umbc::VController::wait_till_complete() {
 
+    Task* t_update = this->t_update_controller_input.get();
+
+    if (t_update != nullptr) {
+        t_update->join();
+    }
 }
