@@ -32,6 +32,50 @@ class VController : public Controller {
 	 */
 	std::int32_t update();
 
+	/**
+	 * Represents the state of a controller's digital channel. 
+	 */
+	class Digital {
+		
+		private:
+		std::uint8_t current : 1;
+		std::uint8_t previous : 1;
+		std::uint8_t newPress : 1;
+
+		public:
+
+		/**
+		 * Creates a new digital object and zeros all data members.
+		 */
+		Digital();
+
+		/**
+		 * Sets the current held value.
+		 * 
+		 * None zero values will be converted to 1.
+		 * 
+		 * \param 
+		 */
+		void set(std::int32_t value);
+
+		/**
+		 * Gets the currently held value.
+		 * 
+		 * \return The current held value.
+		 */
+		std::int32_t get();
+		
+		/**
+		 * Return's a rising edge case for the currently held value.
+		 * 
+		 * This function is not thread-safe.
+	 	 * Multiple tasks polling a single digital object may return different results under
+	 	 * the same circumstances, so only one task should call this function for any
+	 	 * given digital object.
+		 */
+		std::int32_t get_new_press();
+	};
+
     public:
 
 	/**
