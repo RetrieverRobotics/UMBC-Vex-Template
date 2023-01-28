@@ -282,7 +282,7 @@ class VController : public Controller {
 	 * 			The path for the file to retrieve the poll rate and load
 	 * 			the controller input from.
 	 * 
-	 * \return The number of controller input records loaded
+	 * \return 1 on success, 0 otherwise.
 	 */
 	std::int32_t load(const char* file_path);
 	std::int32_t load(std::string& file_path);
