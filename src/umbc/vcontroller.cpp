@@ -40,16 +40,26 @@ umbc::VController::VController():Controller(E_CONTROLLER_MASTER) {
 void umbc::VController::update(void* vcontroller) {
 
     umbc::VController* controller = (umbc::VController*)vcontroller;
+
+    if (0 == controller->poll_rate_ms) {
+        return;
+    }
+
     std::uint32_t now = pros::millis();
 
     while (!controller->controller_input.get()->empty()) {
+
         pros::Task::delay_until(&now, controller->get_poll_rate_ms());
         controller->controller_input.get()->pop();
 
-        // TODO: update buttons.
+        for (auto it = controller->digitals.begin(); it != controller->digitals.end(); it++) {
+            it->second.set(controller->controller_input.get()->front());
+        }
     }
 
-    // TODO: zero buttons through destruction.
+    for (auto it = controller->digitals.begin(); it != controller->digitals.end(); it++) {
+        it->second.reset();
+    }
 }
 
 std::int32_t umbc::VController::is_connected() {
@@ -142,6 +152,7 @@ std::int32_t umbc::VController::load(const char* file_path) {
     }
 
     while(1) {
+        
         ControllerInput controller_input;
         file.read((char*)(&controller_input), sizeof(controller_input)); 
 
