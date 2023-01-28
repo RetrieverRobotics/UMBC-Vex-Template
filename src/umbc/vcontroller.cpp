@@ -9,6 +9,7 @@
 #include "api.h"
 #include "umbc.h"
 
+#include <fstream>
 #include <cstdint>
 
 using namespace pros;
@@ -25,11 +26,16 @@ umbc::VController::VController():Controller(E_CONTROLLER_MASTER) {
 void umbc::VController::update(void* vcontroller) {
 
     umbc::VController* controller = (umbc::VController*)vcontroller;
+    std::uint32_t now = pros::millis();
 
     while (!controller->controller_input.get()->empty()) {
-        delay(controller->get_poll_rate_ms());
+        pros::Task::delay_until(&now, controller->get_poll_rate_ms());
         controller->controller_input.get()->pop();
+
+        // TODO: update buttons.
     }
+
+    // TODO: zero buttons through destruction.
 }
 
 std::int32_t umbc::VController::is_connected() {
@@ -100,6 +106,38 @@ std::int32_t umbc::VController::get_poll_rate_ms() {
 
 std::int32_t umbc::VController::load(const char* file_path) {
 
+    this->controller_input.reset(new std::queue<ControllerInput>());
+
+    std::ifstream file(file_path, std::ifstream::binary);
+    if (!file.good()) {
+        file.close();
+        return 0;
+    }
+
+    file.read((char*)(&(this->poll_rate_ms)), sizeof(this->poll_rate_ms));
+    if (!file.good()) {
+        this->poll_rate_ms = 0;
+        file.close();
+        return 0;
+    }
+
+    while(1) {
+        ControllerInput controller_input;
+        file.read((char*)(&controller_input), sizeof(controller_input)); 
+
+        if (file.eof()) {
+            break;
+        } else if (!file.good()) {
+            this->poll_rate_ms = 0;
+            this->controller_input.reset(new std::queue<ControllerInput>());
+            file.close();
+            return 0;
+        }
+        this->controller_input.get()->push(controller_input);
+    } 
+
+    file.close();
+    return 1;
 }
 
 std::int32_t umbc::VController::load(std::string& file_path) {
