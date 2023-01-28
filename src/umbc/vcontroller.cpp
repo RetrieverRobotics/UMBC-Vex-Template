@@ -10,6 +10,7 @@
 #include "umbc.h"
 
 #include <fstream>
+#include <map>
 #include <cstdint>
 
 using namespace pros;
@@ -21,6 +22,19 @@ umbc::VController::VController():Controller(E_CONTROLLER_MASTER) {
     this->poll_rate_ms = 0;
     this->controller_input.reset(new std::queue<ControllerInput>());
     this->t_update_controller_input.reset(nullptr);
+
+    this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_L1, Digital()));
+    this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_L2, Digital()));
+    this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_R1, Digital()));
+    this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_R2, Digital()));
+    this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_UP, Digital()));
+    this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_DOWN, Digital()));
+    this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_LEFT, Digital()));
+    this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_RIGHT, Digital()));
+    this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_X, Digital()));
+    this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_B, Digital()));
+    this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_Y, Digital()));
+    this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_A, Digital()));  
 }
 
 void umbc::VController::update(void* vcontroller) {
@@ -77,7 +91,9 @@ std::int32_t umbc::VController::get_digital(controller_digital_e_t button) {
 }
 
 std::int32_t umbc::VController::get_digital_new_press(controller_digital_e_t button) {
+
     std::map<controller_digital_e_t, Digital>::iterator digital = this->digitals.find(button);
+
     if (digital == this->digitals.end()) {
         return 0;
     }
@@ -119,7 +135,7 @@ std::int32_t umbc::VController::load(const char* file_path) {
     }
 
     file.read((char*)(&(this->poll_rate_ms)), sizeof(this->poll_rate_ms));
-    if (!file.good() || 0 == poll_rate_ms) {
+    if (!file.good() || 0 == this->poll_rate_ms) {
         this->poll_rate_ms = 0;
         file.close();
         return 0;
@@ -158,7 +174,7 @@ void umbc::VController::pause() {
 
     Task* t_update = this->t_update_controller_input.get();
 
-    if (t_update != nullptr) {
+    if (nullptr != t_update) {
         t_update->suspend();
     }
 }
@@ -167,7 +183,7 @@ void umbc::VController::resume() {
 
     Task* t_update = this->t_update_controller_input.get();
 
-    if (t_update != nullptr) {
+    if (nullptr != t_update) {
         t_update->resume();
     }
 }
@@ -176,16 +192,18 @@ void umbc::VController::stop() {
 
     Task* t_update = this->t_update_controller_input.get();
 
-    if (t_update != nullptr) {
+    if (nullptr != t_update) {
         t_update->remove();
     }
+
+    this->controller_input.reset(new std::queue<ControllerInput>());
 }
 
 void umbc::VController::wait_till_complete() {
 
     Task* t_update = this->t_update_controller_input.get();
 
-    if (t_update != nullptr) {
+    if (nullptr != t_update) {
         t_update->join();
     }
 }
