@@ -77,7 +77,11 @@ std::int32_t umbc::VController::get_digital(controller_digital_e_t button) {
 }
 
 std::int32_t umbc::VController::get_digital_new_press(controller_digital_e_t button) {
-
+    std::map<controller_digital_e_t, Digital>::iterator digital = this->digitals.find(button);
+    if (digital == this->digitals.end()) {
+        return 0;
+    }
+    return digital->second.get_new_press();
 }
 
 std::int32_t umbc::VController::set_text(std::uint8_t line, std::uint8_t col, const char* str) {
@@ -115,7 +119,7 @@ std::int32_t umbc::VController::load(const char* file_path) {
     }
 
     file.read((char*)(&(this->poll_rate_ms)), sizeof(this->poll_rate_ms));
-    if (!file.good()) {
+    if (!file.good() || 0 == poll_rate_ms) {
         this->poll_rate_ms = 0;
         file.close();
         return 0;
