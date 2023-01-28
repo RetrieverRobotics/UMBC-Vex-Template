@@ -53,7 +53,7 @@ void umbc::VController::update(void* vcontroller) {
         controller->controller_input.get()->pop();
 
         for (auto it = controller->digitals.begin(); it != controller->digitals.end(); it++) {
-            it->second.set(controller->controller_input.get()->front());
+            it->second.set(controller->controller_input.get()->front().get_digital(it->first));
         }
     }
 
@@ -152,7 +152,7 @@ std::int32_t umbc::VController::load(const char* file_path) {
     }
 
     while(1) {
-        
+
         ControllerInput controller_input;
         file.read((char*)(&controller_input), sizeof(controller_input)); 
 
