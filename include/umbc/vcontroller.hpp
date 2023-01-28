@@ -14,7 +14,7 @@
 
 #include <cstdint>
 #include <queue>
-
+#include <map>
 using namespace pros;
 using namespace std;
 
@@ -22,9 +22,12 @@ namespace umbc {
 class VController : public Controller {
 
 	private:
-	const char* t_update_controller_input_name = "vcontroller";
+	static constexpr char* t_update_controller_input_name = "vcontroller";
+
+	class Digital;
 
 	std::uint16_t poll_rate_ms;
+	std::map<controller_digital_e_t, Digital> digitals;
 	std::unique_ptr<std::queue<ControllerInput>> controller_input;
 	std::unique_ptr<Task> t_update_controller_input;
 
@@ -65,6 +68,11 @@ class VController : public Controller {
 		 * \param 
 		 */
 		void set(std::int32_t value);
+
+		/**
+		 * Sets all data members to 0.
+		 */
+		void reset();
 
 		/**
 		 * Gets the currently held value.
@@ -277,6 +285,9 @@ class VController : public Controller {
 	/**
 	 * Reads a controller input file, saves the poll rate, and loads the
 	 * controller inputs from the file into a queue.
+	 * 
+	 * If the poll rate in the file is zero, this function will fail
+	 * since zero is an illegal poll rate value.
 	 * 
 	 * \param file_path
 	 * 			The path for the file to retrieve the poll rate and load
