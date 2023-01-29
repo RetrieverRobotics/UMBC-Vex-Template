@@ -20,7 +20,7 @@ using namespace std;
 umbc::VController::VController():Controller(E_CONTROLLER_MASTER) {
 
     this->poll_rate_ms = 0;
-    this->controller_input.reset(new std::queue<ControllerInput>());
+    this->controller_input = std::queue<ControllerInput>();
     this->t_update_controller_input.reset(nullptr);
 
     this->digitals.insert(std::pair<controller_digital_e_t, Digital>(E_CONTROLLER_DIGITAL_L1, Digital()));
@@ -47,13 +47,13 @@ void umbc::VController::update(void* vcontroller) {
 
     std::uint32_t now = pros::millis();
 
-    while (!controller->controller_input.get()->empty()) {
+    while (!controller->controller_input.empty()) {
 
         pros::Task::delay_until(&now, controller->get_poll_rate_ms());
-        controller->controller_input.get()->pop();
+        controller->controller_input.pop();
 
         for (auto it = controller->digitals.begin(); it != controller->digitals.end(); it++) {
-            it->second.set(controller->controller_input.get()->front().get_digital(it->first));
+            it->second.set(controller->controller_input.front().get_digital(it->first));
         }
     }
 
@@ -63,23 +63,15 @@ void umbc::VController::update(void* vcontroller) {
 }
 
 std::int32_t umbc::VController::is_connected() {
-
-    std::queue<ControllerInput>* controller_input = this->controller_input.get();
-
-    if (controller_input == nullptr || controller_input->empty()) {
-        return 0;
-    }
-    return 1;
+    return !this->controller_input.empty();
 }
 
 std::int32_t umbc::VController::get_analog(controller_analog_e_t channel) {
 
-    std::queue<ControllerInput>* controller_input = this->controller_input.get();
-
-    if (controller_input == nullptr || controller_input->empty()) {
+    if (this->controller_input.empty()) {
         return 0;
     }
-    return controller_input->front().get_analog(channel);
+    return this->controller_input.front().get_analog(channel);
 }
 
 std::int32_t umbc::VController::get_battery_capacity() {
@@ -92,12 +84,10 @@ std::int32_t umbc::VController::get_battery_level() {
 
 std::int32_t umbc::VController::get_digital(controller_digital_e_t button) {
 
-    std::queue<ControllerInput>* controller_input = this->controller_input.get();
-
-    if (controller_input == nullptr || controller_input->empty()) {
+    if (this->controller_input.empty()) {
         return 0;
     }
-    return controller_input->front().get_digital(button);
+    return this->controller_input.front().get_digital(button);
 }
 
 std::int32_t umbc::VController::get_digital_new_press(controller_digital_e_t button) {
@@ -136,7 +126,7 @@ std::int32_t umbc::VController::get_poll_rate_ms() {
 
 std::int32_t umbc::VController::load(const char* file_path) {
 
-    this->controller_input.reset(new std::queue<ControllerInput>());
+    this->controller_input = std::queue<ControllerInput>();
 
     std::ifstream file(file_path, std::ifstream::binary);
     if (!file.good()) {
@@ -160,11 +150,11 @@ std::int32_t umbc::VController::load(const char* file_path) {
             break;
         } else if (!file.good()) {
             this->poll_rate_ms = 0;
-            this->controller_input.reset(new std::queue<ControllerInput>());
+            this->controller_input = std::queue<ControllerInput>();
             file.close();
             return 0;
         }
-        this->controller_input.get()->push(controller_input);
+        this->controller_input.push(controller_input);
     } 
 
     file.close();
@@ -207,7 +197,7 @@ void umbc::VController::stop() {
         t_update->remove();
     }
 
-    this->controller_input.reset(new std::queue<ControllerInput>());
+    this->controller_input = std::queue<ControllerInput>();
 }
 
 void umbc::VController::wait_till_complete() {

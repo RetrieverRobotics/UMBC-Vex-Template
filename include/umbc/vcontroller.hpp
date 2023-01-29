@@ -28,7 +28,7 @@ class VController : public Controller {
 
 	std::uint16_t poll_rate_ms;
 	std::map<controller_digital_e_t, Digital> digitals;
-	std::unique_ptr<std::queue<ControllerInput>> controller_input;
+	std::queue<ControllerInput> controller_input;
 	std::unique_ptr<Task> t_update_controller_input;
 
 	/**
