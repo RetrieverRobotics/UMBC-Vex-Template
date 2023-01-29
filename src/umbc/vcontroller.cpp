@@ -218,3 +218,32 @@ void umbc::VController::wait_till_complete() {
         t_update->join();
     }
 }
+
+umbc::VController::Digital::Digital(){
+    this->reset();
+}
+
+void umbc::VController::Digital::set(std::int32_t value) {
+
+    this->previous = this->current;
+    this->current = value;
+    this->newPress = this->newPress || (this->current && !this->previous);
+}
+
+void umbc::VController::Digital::reset() {
+
+    this->current = 0;
+    this->previous = 0;
+    this->newPress = 0;
+}
+
+std::int32_t umbc::VController::Digital::get() {
+    return this->current;
+}
+
+std::int32_t umbc::VController::Digital::get_new_press() {
+
+    int32_t newPress = this->newPress;
+    this->newPress = 0;
+    return newPress;
+}
