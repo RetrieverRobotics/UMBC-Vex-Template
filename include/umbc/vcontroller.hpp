@@ -38,7 +38,7 @@ class VController : public Controller {
 	 * static.
 	 * 
 	 * \param VController
-	 * 			The virtual controller whos inputs will be updated. The type for
+	 * 			The virtual controller whose inputs will be updated. The type for
 	 * 			this parameter must be VController. Intended to be 'this' pointer.
 	 */
 	static void update(void* VController);
