@@ -276,13 +276,6 @@ class VController : public Controller {
 	std::int32_t clear(void);
 
 	/**
-	 * Returns the rate in milliseconds the controller inputs are updated.
-	 * 
-	 * \return The rate in millisconds te controller inputs are updated.
-	 */
-	std::int32_t get_poll_rate_ms();
-
-	/**
 	 * Reads a controller input file, saves the poll rate, and loads the
 	 * controller inputs from the file into a queue.
 	 * 
