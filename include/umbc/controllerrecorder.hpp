@@ -19,7 +19,6 @@ using namespace pros;
 using namespace std;
 
 namespace umbc {
-
 class ControllerRecorder {
 
     private:
