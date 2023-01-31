@@ -32,28 +32,49 @@ std::int32_t save(const char* file_path) {
 
 }
 
+void umbc::ControllerRecorder::start() {
 
-void start() {
+    this->t_record_controller_input.reset(
+        new Task((task_fn_t)this->record, (void*)this, this->t_record_controller_input_name));
+}
+
+void umbc::ControllerRecorder::pause() {
+
+    Task* t_record = this->t_record_controller_input.get();
+
+    if (nullptr != t_record) {
+        t_record->suspend();
+    }
+}
+
+void umbc::ControllerRecorder::resume() {
+
+    Task* t_record = this->t_record_controller_input.get();
+
+    if (nullptr != t_record) {
+        t_record->resume();
+    }
+}
+
+void umbc::ControllerRecorder::stop() {
+
+    Task* t_record = this->t_record_controller_input.get();
+
+    if (nullptr != t_record) {
+        t_record->remove();
+    }
+
+    this->controller_input = std::queue<ControllerInput>();
+}
+
+void umbc::ControllerRecorder::reset() {
+    this->controller_input = queue<ControllerInput>();
+}
+
+std::int32_t umbc::ControllerRecorder::isRecording() {
 
 }
 
-
-void pause() {
-
-}
-
-void resume() {
-
-}
-
-void stop() {
-
-}
-
-void reset() {
-
-}
-
-std::int32_t isRecording() {
+std::int32_t umbc::ControllerRecorder::hasControllerInput() {
 
 }

@@ -99,6 +99,13 @@ class ControllerRecorder {
      * \return 1 if currently recording, otherwise 0
      */
     std::int32_t isRecording();
+
+    /**
+     * Checks if there is any controller input that has been recorded.
+     * 
+     * \return 1 if there is controller input recorded, otherwise 0 
+     */
+    std::int32_t hasControllerInput();
 };
 }
 
