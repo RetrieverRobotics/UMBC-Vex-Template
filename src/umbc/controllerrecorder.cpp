@@ -19,9 +19,12 @@ using namespace std;
 
 umbc::ControllerRecorder::ControllerRecorder(controller_id_e_t controller_id, std::uint16_t poll_rate_ms) {
 
+    this->poll_rate_ms = 0;
+    this->controller_input = std::queue<ControllerInput>();
+    this->t_record_controller_input.reset(nullptr);
 }
 
-static void record(void* ControllerRecorder) {
+void umbc::ControllerRecorder::record(void* ControllerRecorder) {
 
 }
 

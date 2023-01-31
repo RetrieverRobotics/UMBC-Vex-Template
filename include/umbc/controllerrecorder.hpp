@@ -27,6 +27,7 @@ class ControllerRecorder {
     std::uint16_t poll_rate_ms;
     controller_id_e_t controller_id;
     std::queue<ControllerInput> controller_input;
+    std::unique_ptr<Task> t_record_controller_input;
 
     /**
 	 * Pushes current controller input to the controller input queue at the
