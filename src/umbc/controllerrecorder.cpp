@@ -73,8 +73,15 @@ void umbc::ControllerRecorder::reset() {
 
 std::int32_t umbc::ControllerRecorder::isRecording() {
 
+    Task* t_record = this->t_record_controller_input.get();
+
+    if (nullptr == t_record) {
+        return 0;
+    }
+
+    return this->t_record_controller_input.get()->get_state() == E_TASK_STATE_RUNNING;
 }
 
 std::int32_t umbc::ControllerRecorder::hasControllerInput() {
-
+    return !this->controller_input.empty();
 }
