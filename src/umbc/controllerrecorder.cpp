@@ -17,8 +17,9 @@ using namespace pros;
 using namespace umbc;
 using namespace std;
 
-umbc::ControllerRecorder::ControllerRecorder(controller_id_e_t controller_id, std::uint16_t poll_rate_ms) {
+umbc::ControllerRecorder::ControllerRecorder(pros::Controller* controller, std::uint16_t poll_rate_ms) {
 
+    this->controller = controller;
     this->poll_rate_ms = 0;
     this->controller_input = std::queue<ControllerInput>();
     this->t_record_controller_input.reset(nullptr);
@@ -28,7 +29,7 @@ void umbc::ControllerRecorder::record(void* ControllerRecorder) {
 
 }
 
-std::int32_t save(const char* file_path) {
+std::int32_t umbc::ControllerRecorder::save(const char* file_path) {
 
 }
 

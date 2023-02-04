@@ -278,7 +278,7 @@ class VController : public Controller {
 	/**
 	 * Returns the rate in milliseconds the controller inputs are updated.
 	 * 
-	 * \return The rate in millisconds te controller inputs are updated.
+	 * \return The rate in millisconds the controller inputs are updated.
 	 */
 	std::int32_t get_poll_rate_ms();
 
