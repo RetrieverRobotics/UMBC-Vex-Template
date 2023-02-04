@@ -25,7 +25,7 @@ class ControllerRecorder {
     static constexpr char* t_record_controller_input_name = "controllerrecorder";
 
     std::uint16_t poll_rate_ms;
-    controller_id_e_t controller_id;
+    pros::Controller* controller;
     std::queue<ControllerInput> controller_input;
     std::unique_ptr<Task> t_record_controller_input;
 
@@ -48,14 +48,22 @@ class ControllerRecorder {
 	 * Creates a controller recorder object.
      * 
      * \param controller_id
-	 *      The ID of the controller (e.g. the master or partner controller) that will
-     *      be recorded. Must be one of CONTROLLER_MASTER or CONTROLLER_PARTNER
+	 *      The controller to record.
      * 
      * \param poll_rate_ms
      *      The rate in milliseconds controller input will be polled at.
      *           
 	 */
-    ControllerRecorder(controller_id_e_t controller_id, std::uint16_t poll_rate_ms);
+    ControllerRecorder(pros::Controller* controller, std::uint16_t poll_rate_ms);
+
+    /**
+	 * Returns the rate in milliseconds the controller inputs are recorded.
+	 * 
+	 * \return The rate in millisconds the controller inputs are recorded.
+	 */
+    std::int32_t get_poll_rate_ms() {
+        return this->poll_rate_ms;
+    }
 
     /**
      * Saves the poll rate and recorded controller input into a binary file.
