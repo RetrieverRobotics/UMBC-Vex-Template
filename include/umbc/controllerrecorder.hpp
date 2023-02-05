@@ -68,9 +68,15 @@ class ControllerRecorder {
     /**
      * Saves the poll rate and recorded controller input into a binary file.
      * 
+     * This method is destructive and will clear all recorded controller
+     * input.
+     * 
      * \param file_path
-     *      The file path that the binary file will be created adn saved at. If
-     *      a file already exists at this location, it will be overwritten. 
+     *      The file path that the binary file will be created and saved at. If
+     *      a file already exists at this location, it will be overwritten.
+     * 
+     * \return Number of controller inputs written to the file, otherwise -1 on
+     * failure.
      */
     std::int32_t save(const char* file_path);
 

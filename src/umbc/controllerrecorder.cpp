@@ -31,6 +31,36 @@ void umbc::ControllerRecorder::record(void* ControllerRecorder) {
 
 std::int32_t umbc::ControllerRecorder::save(const char* file_path) {
 
+    std::int32_t number_of_controller_inputs = this->controller_input.size();
+
+    if (0 == this->poll_rate_ms || this->controller_input.empty()) {
+        return -1;
+    }
+
+    std::ofstream file(file_path, std::ifstream::binary);
+    if (!file.good()) {
+        file.close();
+        return -1;
+    }
+
+    file.write((char*)(&(this->poll_rate_ms)), sizeof(this->poll_rate_ms));
+    if (!file.good()) {
+        file.close();
+        return -1;
+    }
+
+    while (!this->controller_input.empty()) {
+        file.write((char*)(&(this->controller_input.front())), sizeof(umbc::ControllerInput));
+        if (!file.good()) {
+            file.close();
+            this->reset();
+            return -1;
+        }
+        this->controller_input.pop();
+    }
+    file.close();
+
+    return number_of_controller_inputs;
 }
 
 void umbc::ControllerRecorder::start() {
