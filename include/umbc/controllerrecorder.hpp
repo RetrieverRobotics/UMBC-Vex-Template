@@ -35,6 +35,9 @@ class ControllerRecorder {
 	 * 
 	 * This function is intended to be used as a task, which is why it is
 	 * static.
+     * 
+     * This will continue to record until stop is called or the number of
+     * recorded inputs reached INT32_MAX.
 	 * 
 	 * \param ControllerRecorder
 	 * 			The controller recorder who will be saving controller input.
@@ -47,7 +50,7 @@ class ControllerRecorder {
     /**
 	 * Creates a controller recorder object.
      * 
-     * \param controller_id
+     * \param controller
 	 *      The controller to record.
      * 
      * \param poll_rate_ms
@@ -55,15 +58,6 @@ class ControllerRecorder {
      *           
 	 */
     ControllerRecorder(pros::Controller* controller, std::uint16_t poll_rate_ms);
-
-    /**
-	 * Returns the rate in milliseconds the controller inputs are recorded.
-	 * 
-	 * \return The rate in millisconds the controller inputs are recorded.
-	 */
-    std::int32_t get_poll_rate_ms() {
-        return this->poll_rate_ms;
-    }
 
     /**
      * Saves the poll rate and recorded controller input into a binary file.
