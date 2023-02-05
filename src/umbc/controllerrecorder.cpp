@@ -27,6 +27,58 @@ umbc::ControllerRecorder::ControllerRecorder(pros::Controller* controller, std::
 
 void umbc::ControllerRecorder::record(void* ControllerRecorder) {
 
+    umbc::ControllerRecorder* controller_recorder = (umbc::ControllerRecorder*)ControllerRecorder;
+
+    if (0 == controller_recorder->poll_rate_ms) {
+        return;
+    }
+
+    std::uint32_t now = pros::millis();
+
+    while (INT32_MAX > controller_recorder->controller_input.empty())
+    {
+        ControllerInput controller_input;
+
+        controller_input.set_digital(E_CONTROLLER_DIGITAL_L1,
+            controller_recorder->controller->get_digital(E_CONTROLLER_DIGITAL_L1));
+        controller_input.set_digital(E_CONTROLLER_DIGITAL_L2,
+            controller_recorder->controller->get_digital(E_CONTROLLER_DIGITAL_L2));
+        controller_input.set_digital(E_CONTROLLER_DIGITAL_R1,
+            controller_recorder->controller->get_digital(E_CONTROLLER_DIGITAL_R1));
+        controller_input.set_digital(E_CONTROLLER_DIGITAL_R2,
+            controller_recorder->controller->get_digital(E_CONTROLLER_DIGITAL_R2));
+        controller_input.set_digital(E_CONTROLLER_DIGITAL_UP,
+            controller_recorder->controller->get_digital(E_CONTROLLER_DIGITAL_UP));
+        controller_input.set_digital(E_CONTROLLER_DIGITAL_DOWN,
+            controller_recorder->controller->get_digital(E_CONTROLLER_DIGITAL_DOWN));
+        controller_input.set_digital(E_CONTROLLER_DIGITAL_LEFT,
+            controller_recorder->controller->get_digital(E_CONTROLLER_DIGITAL_LEFT));
+        controller_input.set_digital(E_CONTROLLER_DIGITAL_RIGHT,
+            controller_recorder->controller->get_digital(E_CONTROLLER_DIGITAL_RIGHT));
+        controller_input.set_digital(E_CONTROLLER_DIGITAL_X,
+            controller_recorder->controller->get_digital(E_CONTROLLER_DIGITAL_X));
+        controller_input.set_digital(E_CONTROLLER_DIGITAL_B,
+            controller_recorder->controller->get_digital(E_CONTROLLER_DIGITAL_B));
+        controller_input.set_digital(E_CONTROLLER_DIGITAL_Y,
+            controller_recorder->controller->get_digital(E_CONTROLLER_DIGITAL_Y));
+        controller_input.set_digital(E_CONTROLLER_DIGITAL_A,
+            controller_recorder->controller->get_digital(E_CONTROLLER_DIGITAL_A));
+
+        controller_input.set_analog(E_CONTROLLER_ANALOG_LEFT_X,
+            controller_recorder->controller->get_analog(E_CONTROLLER_ANALOG_LEFT_X));
+        controller_input.set_analog(E_CONTROLLER_ANALOG_LEFT_Y,
+            controller_recorder->controller->get_analog(E_CONTROLLER_ANALOG_LEFT_Y));
+        controller_input.set_analog(E_CONTROLLER_ANALOG_LEFT_X,
+            controller_recorder->controller->get_analog(E_CONTROLLER_ANALOG_RIGHT_X));
+        controller_input.set_analog(E_CONTROLLER_ANALOG_RIGHT_Y,
+            controller_recorder->controller->get_analog(E_CONTROLLER_ANALOG_RIGHT_Y));
+
+        controller_recorder->controller_input.push(controller_input);
+
+        pros::Task::delay_until(&now, controller_recorder->poll_rate_ms);
+    }
+
+    return;
 }
 
 std::int32_t umbc::ControllerRecorder::save(const char* file_path) {

@@ -49,7 +49,7 @@ void umbc::VController::update(void* vcontroller) {
 
     while (!controller->controller_input.empty()) {
 
-        pros::Task::delay_until(&now, controller->get_poll_rate_ms());
+        pros::Task::delay_until(&now, controller->poll_rate_ms);
         controller->controller_input.pop();
 
         for (auto it = controller->digitals.begin(); it != controller->digitals.end(); it++) {
@@ -118,10 +118,6 @@ std::int32_t umbc::VController::rumble(const char* rumble_pattern) {
 
 std::int32_t umbc::VController::clear() {
     return 1;
-}
-
-std::int32_t umbc::VController::get_poll_rate_ms() {
-    return this->poll_rate_ms;
 }
 
 std::int32_t umbc::VController::load(const char* file_path) {
