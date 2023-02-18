@@ -4,6 +4,7 @@
 #ifdef __cplusplus
 #include "umbc/controllerinput.hpp"
 #include "umbc/controllerrecorder.hpp"
+#include "umbc/robot.hpp"
 #include "umbc/vcontroller.hpp"
 #endif
 
