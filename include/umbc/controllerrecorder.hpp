@@ -22,6 +22,8 @@ namespace umbc {
 class ControllerRecorder {
 
     private:
+    static constexpr char* t_record_controller_input_name = "controllerrecorder";
+
     std::uint16_t poll_rate_ms;
     pros::Controller* controller;
     std::queue<ControllerInput> controller_input;
