@@ -43,8 +43,6 @@ typedef enum {
 class Robot {
     
     private:
-    static constexpr char* t_current_name = "robot";
-    
     std::int32_t mode;
     std::int32_t competition;
     std::int32_t alliance;
