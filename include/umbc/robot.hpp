@@ -77,7 +77,7 @@ class Robot {
 
     /**
      * Menu for selecting mode, competition, alliance, and starting
-     * position usuing the LLEMU.
+     * position useing the LLEMU.
      */
     void menu();
 
