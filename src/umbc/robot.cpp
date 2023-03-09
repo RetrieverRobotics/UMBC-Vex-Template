@@ -156,6 +156,38 @@ std::int32_t umbc::Robot::menu_position() {
 
 void umbc::Robot::menu() {
 
+    const uint8_t last_sub_menu = MENU_POSITION;
+    uint8_t current_sub_menu = MENU_COMPETITION;
+
+    if (!pros::lcd::is_initialized()) {
+        return;
+    }
+
+    pros::lcd::clear();
+
+    while (MENU_POSITION >= current_sub_menu) {
+
+        switch (current_sub_menu) {
+            case MENU_COMPETITION:
+                current_sub_menu += menu_competition();
+            break;
+            case MENU_MODE:
+                current_sub_menu += menu_mode();
+            break;
+            case MENU_ALLIANCE:
+                current_sub_menu += menu_alliance();
+            break;
+            case MENU_POSITION:
+                current_sub_menu += menu_position();
+            default:
+                break;
+        }
+    }
+
+    pros::lcd::clear();
+    pros::lcd::set_text(1, "Selection Complete");
+    pros::Task::delay(3000);
+    pros::lcd::clear();
 }
 
 void umbc::Robot::autonomous() {
