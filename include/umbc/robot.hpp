@@ -50,7 +50,7 @@ class Robot {
     /**
      * Menu to select the competition type using the LLEMU.
      * 
-     * @returns 1 if a selection was made, otherwise -1.
+     * @returns always 1
      */
     std::int32_t menu_competition();
 
