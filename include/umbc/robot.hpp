@@ -19,34 +19,33 @@ using namespace std;
 
 namespace umbc {
 typedef enum {
-    ALLIANCE_RED = 0,
-    ALLIANCE_BLUE = 1
-} alliance;
-
-typedef enum {
-    POSITION_ONE = 0,
-    POSITION_TWO = 1
-} position;
-
-typedef enum {
     COMPETITION_MATCH = 0,
     COMPETITION_SKILLS = 1
 } competition;
 
 typedef enum {
     MODE_COMPETITION = 0,
-    MODE_TRAIN_AUTONOMOUS = 1,
-    MODE_PRACTICE_AUTONOMOUS = 2,
-    MODE_PRACTICE_OPCONTROL = 3
+    MODE_TRAIN_AUTONOMOUS = 1
 } mode;
+
+typedef enum {
+    ALLIANCE_RED = 0,
+    ALLIANCE_BLUE = 1
+} alliance;
+
+typedef enum {
+    POSITION_ALPHA = 0,
+    POSITION_BRAVO = 1
+} position;
+
 
 class Robot {
     
     private:
-    std::int32_t mode;
-    std::int32_t competition;
-    std::int32_t alliance;
-    std::int32_t position;
+    umbc::competition competition;
+    umbc::mode mode;
+    umbc::alliance alliance;
+    umbc::position position;
 
     /**
      * Menu to select the mode using the LLEMU.
