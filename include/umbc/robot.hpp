@@ -2,7 +2,7 @@
  * \file umbc/robot.hpp
  *
  * Contains the prototype for the Robot. The Robot holds various values used for
- * competition and practice, as well as holds the functions for the selection menu,
+ * different modes, as well as holds the functions for the selection menu,
  * autonomous, training autonomous, and opcontrol.
  */
 
@@ -19,52 +19,65 @@ using namespace std;
 
 namespace umbc {
 typedef enum {
-    ALLIANCE_RED = 0,
-    ALLIANCE_BLUE = 1
-} alliance;
-
-typedef enum {
-    POSITION_ONE = 0,
-    POSITION_TWO = 1
-} position;
-
-typedef enum {
     COMPETITION_MATCH = 0,
     COMPETITION_SKILLS = 1
 } competition;
 
 typedef enum {
     MODE_COMPETITION = 0,
-    MODE_TRAIN_AUTONOMOUS = 1,
-    MODE_PRACTICE_AUTONOMOUS = 2,
-    MODE_PRACTICE_OPCONTROL = 3
+    MODE_TRAIN_AUTONOMOUS = 1
 } mode;
+
+typedef enum {
+    ALLIANCE_RED = 0,
+    ALLIANCE_BLUE = 1
+} alliance;
+
+typedef enum {
+    POSITION_ALPHA = 0,
+    POSITION_BRAVO = 1
+} position;
+
+typedef enum {
+    MENU_COMPETITION = 0,
+    MENU_MODE = 1,
+    MENU_ALLIANCE = 2,
+    MENU_POSITION = 3
+} sub_menu;
 
 class Robot {
     
     private:
-    std::int32_t mode;
-    std::int32_t competition;
-    std::int32_t alliance;
-    std::int32_t position;
-
-    /**
-     * Menu to select the mode using the LLEMU.
-     */
-    std::int32_t menu_mode();
+    umbc::competition competition;
+    umbc::mode mode;
+    umbc::alliance alliance;
+    umbc::position position;
 
     /**
      * Menu to select the competition type using the LLEMU.
+     * 
+     * @returns always 1
      */
     std::int32_t menu_competition();
 
     /**
+     * Menu to select the mode using the LLEMU.
+     * 
+     * @returns 1 if a selection was made, otherwise -1.
+     */
+    std::int32_t menu_mode();
+
+    /**
      * Menu to select the alliance using the LLEMU.
+     * 
+     * @returns 1 if a selection was made, otherwise -1.
      */
     std::int32_t menu_alliance();
 
     /**
      * Menu to select the starting position using the LLEMU.
+     * 
+     * @returns 1 if a selection was made, otherwise -1.
      */
     std::int32_t menu_position();
 
