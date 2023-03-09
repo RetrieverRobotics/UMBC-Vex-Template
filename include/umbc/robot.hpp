@@ -38,6 +38,12 @@ typedef enum {
     POSITION_BRAVO = 1
 } position;
 
+typedef enum {
+    MENU_COMPETITION = 0,
+    MENU_MODE = 1,
+    MENU_ALLIANCE = 2,
+    MENU_POSITION = 3
+} sub_menu;
 
 class Robot {
     
