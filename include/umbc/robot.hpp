@@ -53,6 +53,9 @@ class Robot {
     umbc::alliance alliance;
     umbc::position position;
 
+    pros::Controller master = pros::Controller(E_CONTROLLER_MASTER);
+    pros::Controller partner = pros::Controller(E_CONTROLLER_PARTNER);
+
     /**
      * Menu to select the competition type using the LLEMU.
      * 
