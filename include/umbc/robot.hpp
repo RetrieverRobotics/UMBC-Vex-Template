@@ -2,7 +2,7 @@
  * \file umbc/robot.hpp
  *
  * Contains the prototype for the Robot. The Robot holds various values used for
- * competition and practice, as well as holds the functions for the selection menu,
+ * different modes, as well as holds the functions for the selection menu,
  * autonomous, training autonomous, and opcontrol.
  */
 
@@ -48,22 +48,30 @@ class Robot {
     umbc::position position;
 
     /**
-     * Menu to select the mode using the LLEMU.
-     */
-    std::int32_t menu_mode();
-
-    /**
      * Menu to select the competition type using the LLEMU.
+     * 
+     * @returns 1 if a selection was made, otherwise -1.
      */
     std::int32_t menu_competition();
 
     /**
+     * Menu to select the mode using the LLEMU.
+     * 
+     * @returns 1 if a selection was made, otherwise -1.
+     */
+    std::int32_t menu_mode();
+
+    /**
      * Menu to select the alliance using the LLEMU.
+     * 
+     * @returns 1 if a selection was made, otherwise -1.
      */
     std::int32_t menu_alliance();
 
     /**
      * Menu to select the starting position using the LLEMU.
+     * 
+     * @returns 1 if a selection was made, otherwise -1.
      */
     std::int32_t menu_position();
 
