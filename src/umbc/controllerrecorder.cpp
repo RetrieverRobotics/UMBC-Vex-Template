@@ -146,8 +146,6 @@ void umbc::ControllerRecorder::stop() {
     if (nullptr != t_record) {
         t_record->remove();
     }
-
-    this->controller_input = std::queue<ControllerInput>();
 }
 
 void umbc::ControllerRecorder::reset() {
