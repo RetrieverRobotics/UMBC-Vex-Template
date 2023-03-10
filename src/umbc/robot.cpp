@@ -45,11 +45,13 @@ std::int32_t umbc::Robot::menu_competition() {
     }
 
     pros::lcd::clear();
+
+    return 1;
 }
 
 std::int32_t umbc::Robot::menu_mode() {
 
-    std::uint8_t menu_direction = 1;
+    std::int32_t menu_direction = 1;
     std::uint8_t btn_press = 0;
 
     pros::lcd::clear();
@@ -85,7 +87,7 @@ std::int32_t umbc::Robot::menu_mode() {
 
 std::int32_t umbc::Robot::menu_alliance() {
 
-    std::uint8_t menu_direction = 1;
+    std::int32_t menu_direction = 1;
     std::uint8_t btn_press = 0;
 
     pros::lcd::clear();
@@ -121,7 +123,7 @@ std::int32_t umbc::Robot::menu_alliance() {
 
 std::int32_t umbc::Robot::menu_position() {
 
-    std::uint8_t menu_direction = 1;
+    std::int32_t menu_direction = 1;
     std::uint8_t btn_press = 0;
 
     pros::lcd::clear();
