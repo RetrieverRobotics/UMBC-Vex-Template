@@ -96,7 +96,7 @@ class Robot {
      * Allows operator to manually control the robot via a controller. Used
      * for training autonomous.
      */
-    static void opcontrol_static(Robot robot);
+    static void robot_opcontrol(Robot robot);
 
     public:
     
@@ -106,18 +106,60 @@ class Robot {
     Robot();
 
     /**
+     * Sets the master controller.
+     * 
+     * @param controller_master New master controller
+     */
+    void set_controller_master(pros::Controller controller_master);
+
+    /**
+     * Sets the partner controller.
+     * 
+     * @param controller_partner New partner controller
+     */
+    void set_controller_partner(pros::Controller controller_partner);
+
+    /**
      * Retrieve the master controller.
      * 
-     * @return The master controller.
+     * @return The master controller
      */
     pros::Controller get_controller_master();
 
     /**
      * Retrieve the partner controller.
      * 
-     * @return the partner controller.
+     * @return the partner controller
      */
     pros::Controller get_controller_partner();
+
+    /**
+     * Retrieve the competition setting.
+     * 
+     * @return the competition setting
+    */
+    umbc::competition get_competition();
+    
+    /**
+     * Retrieve the robot mode setting.
+     * 
+     * @return the robot mode setting
+    */
+    umbc::mode get_mode();
+    
+    /**
+     * Retrieve the alliance setting.
+     * 
+     * @return the alliance setting
+    */
+    umbc::alliance get_alliance();
+    
+    /**
+     * Retrieve the starting position setting.
+     * 
+     * @return the starting position setting
+    */
+    umbc::position get_position();
 
     /**
      * Menu for selecting mode, competition, alliance, and starting
