@@ -204,8 +204,47 @@ void umbc::Robot::opcontrol_static(Robot robot) {
     robot.opcontrol(robot.get_controller_master(), robot.get_controller_partner());
 }
 
-void umbc::Robot::autonomous() {
+void umbc::Robot::autonomous(uint32_t include_partner_controller) {
 
+    char* t_autonomous_name = "autonomous";
+
+    pros::Controller controller_master_prev = this->get_controller_master();
+    pros::Controller controller_partner_prev = this->get_controller_partner();
+
+    VController vcontroller_master = VController();
+    VController vcontroller_partner = VController();
+
+    this->controller_master = vcontroller_master;
+    this->controller_partner = vcontroller_partner;
+
+    if (COMPETITION_SKILLS == this->competition) {
+
+        vcontroller_master.load(this->skills_autonomous_file_master);
+        if (include_partner_controller) {
+            vcontroller_partner.load(this->skills_autonomous_file_partner);
+        }
+    } else {
+
+        vcontroller_master.load(this->match_autonomous_file_master);
+        if (include_partner_controller) {
+            vcontroller_partner.load(this->match_autonomous_file_partner);
+        }
+    }
+
+    Task opcontrol = Task((task_fn_t)this->opcontrol_static, (void*)this, t_autonomous_name);
+    vcontroller_master.start();
+    if (include_partner_controller) {
+        vcontroller_partner.start();
+    }
+
+    vcontroller_master.wait_till_complete();
+    if (include_partner_controller) {
+        vcontroller_partner.wait_till_complete();
+    }
+    opcontrol.remove();
+
+    this->controller_master = controller_master_prev;
+    this->controller_partner = controller_partner_prev;
 }
 
 void umbc::Robot::opcontrol(pros::Controller controller_master, pros::Controller controller_partner) {
