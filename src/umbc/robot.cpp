@@ -155,12 +155,47 @@ std::int32_t umbc::Robot::menu_position() {
     return menu_direction;
 }
 
+umbc::Robot::Robot() {
+
+    this->competition = COMPETITION_MATCH;
+    this->mode = MODE_COMPETITION;
+    this->alliance = ALLIANCE_RED;
+    this->position = POSITION_ALPHA;
+}
+
+void umbc::Robot::set_controller_master(pros::Controller controller_master) {
+    this->controller_master = controller_master;
+}
+
+void umbc::Robot::set_controller_partner(pros::Controller controller_partner) {
+    this->controller_partner = controller_partner;
+}
+
 pros::Controller umbc::Robot::get_controller_master() {
     return this->controller_master;
 }
 
 pros::Controller umbc::Robot::get_controller_partner() {
     return this->controller_partner;
+}
+
+umbc::competition umbc::Robot::get_competition() {
+    return this->competition;
+}
+    
+
+umbc::mode umbc::Robot::get_mode() {
+    return this->mode;
+}
+    
+
+umbc::alliance umbc::Robot::get_alliance() {
+    return this->alliance;
+}
+    
+
+umbc::position umbc::Robot::get_position() {
+    return this->position;
 }
 
 void umbc::Robot::menu() {
@@ -199,7 +234,7 @@ void umbc::Robot::menu() {
     pros::lcd::clear();
 }
 
-void umbc::Robot::opcontrol_static(Robot robot) {
+void umbc::Robot::robot_opcontrol(Robot robot) {
 
     robot.opcontrol(robot.get_controller_master(), robot.get_controller_partner());
 }
@@ -231,7 +266,7 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
         }
     }
 
-    Task opcontrol = Task((task_fn_t)this->opcontrol_static, (void*)this, t_autonomous_name);
+    Task opcontrol = Task((task_fn_t)this->robot_opcontrol, (void*)this, t_autonomous_name);
     vcontroller_master.start();
     if (include_partner_controller) {
         vcontroller_partner.start();
@@ -247,10 +282,6 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
     this->controller_partner = controller_partner_prev;
 }
 
-void umbc::Robot::opcontrol(pros::Controller controller_master, pros::Controller controller_partner) {
-
-}
-
 void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
 
     char* t_train_autonomous_name = "trainautonomous";
@@ -258,7 +289,7 @@ void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
     ControllerRecorder controller_recorder_master = ControllerRecorder(&controller_master, autonomous_train_poll_rate_ms);
     ControllerRecorder controller_recorder_partner = ControllerRecorder(&controller_partner, autonomous_train_poll_rate_ms);
 
-    Task opcontrol = Task((task_fn_t)this->opcontrol_static, (void*)this, t_train_autonomous_name);
+    Task opcontrol = Task((task_fn_t)this->robot_opcontrol, (void*)this, t_train_autonomous_name);
     controller_recorder_master.start();
     if (record_partner_controller) {
         controller_recorder_partner.start();
