@@ -129,8 +129,11 @@ class Robot {
      * Robot performs a preset routine that was created by training
      * the robot using the controller recorder and playing back the
      * controller inputs using the virtual controller.
+     * 
+     * @param include_partner_controller - Set to true if partner controller
+     *      input was previously recorded and should be used.
      */
-    void autonomous();
+    void autonomous(uint32_t include_partner_controller);
 
     /**
      * Allows operator to manually control the robot via a controller.
