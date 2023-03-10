@@ -54,7 +54,7 @@ class Robot {
     static constexpr char* skills_autonomous_file_partner = "/usd/autonomous_skills-partner.bin";
     static constexpr uint32_t match_autonomous_time_ms = 45000;
     static constexpr uint32_t skills_autonomous_time_ms = 75000;
-    static constexpr uint32_t autonomous_train_poll_rate_ms = 10;
+    static constexpr uint32_t opcontrol_delay_ms = 10;
 
     umbc::competition competition;
     umbc::mode mode;
