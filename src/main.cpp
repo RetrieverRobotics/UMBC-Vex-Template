@@ -93,6 +93,8 @@ void opcontrol() {
 	if (MODE_TRAIN_AUTONOMOUS == robot.get_mode()) {
 		pros::lcd::set_text(1, "Autonomous Training Active");
 		robot.train_autonomous(PARTNER_CONTROLLER);
+		pros::lcd::clear();
+		pros::lcd::set_text(1, "Autonomous Training Complete");
 	} else {
 		pros::lcd::set_text(1, "Opcontrol Active");
 		robot.set_controller_master(pros::Controller(E_CONTROLLER_MASTER));
@@ -100,5 +102,6 @@ void opcontrol() {
 		robot.opcontrol(robot.get_controller_master(), robot.get_controller_partner());
 	}
 
+	while (1);
 	pros::lcd::clear();
 }
