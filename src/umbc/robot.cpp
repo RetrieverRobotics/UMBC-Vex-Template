@@ -10,6 +10,7 @@
 #include "umbc.h"
 
 #include <cstdint>
+#include <string>
 
 using namespace pros;
 using namespace umbc;
@@ -154,6 +155,14 @@ std::int32_t umbc::Robot::menu_position() {
     return menu_direction;
 }
 
+pros::Controller umbc::Robot::get_controller_master() {
+    return this->controller_master;
+}
+
+pros::Controller umbc::Robot::get_controller_partner() {
+    return this->controller_partner;
+}
+
 void umbc::Robot::menu() {
 
     const uint8_t last_sub_menu = MENU_POSITION;
@@ -190,14 +199,53 @@ void umbc::Robot::menu() {
     pros::lcd::clear();
 }
 
+void umbc::Robot::opcontrol_static(Robot robot) {
+
+    robot.opcontrol(robot.get_controller_master(), robot.get_controller_partner());
+}
+
 void umbc::Robot::autonomous() {
 
 }
 
-void umbc::Robot::opcontrol() {
+void umbc::Robot::opcontrol(pros::Controller controller_master, pros::Controller controller_partner) {
 
 }
 
-void umbc::Robot::train_autonomous() {
+void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
 
+    char* t_train_autonomous_name = "trainautonomous";
+
+    ControllerRecorder controller_recorder_master = ControllerRecorder(&controller_master, autonomous_train_poll_rate_ms);
+    ControllerRecorder controller_recorder_partner = ControllerRecorder(&controller_partner, autonomous_train_poll_rate_ms);
+
+    Task opcontrol = Task((task_fn_t)this->opcontrol_static, (void*)this, t_train_autonomous_name);
+    controller_recorder_master.start();
+    if (record_partner_controller) {
+        controller_recorder_partner.start();
+    }
+
+    if (COMPETITION_SKILLS == this->competition) {
+        pros::Task::delay(this->match_autonomous_time_ms);
+    } else {
+        pros::Task::delay(this->match_autonomous_time_ms);
+    }
+
+    opcontrol.remove();
+    controller_recorder_master.stop();
+    if (record_partner_controller) {
+        controller_recorder_partner.stop();
+    }
+
+    if (COMPETITION_SKILLS == this->competition) {
+        controller_recorder_master.save(this->skills_autonomous_file_master);
+        if (record_partner_controller) {
+            controller_recorder_partner.save(this->skills_autonomous_file_partner);
+        }
+    } else {
+        controller_recorder_master.save(this->match_autonomous_file_master);
+        if (record_partner_controller) {
+            controller_recorder_partner.save(this->match_autonomous_file_partner);
+        }
+    }
 }
