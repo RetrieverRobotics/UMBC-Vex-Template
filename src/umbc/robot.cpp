@@ -286,8 +286,8 @@ void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
 
     char* t_train_autonomous_name = "trainautonomous";
 
-    ControllerRecorder controller_recorder_master = ControllerRecorder(&controller_master, autonomous_train_poll_rate_ms);
-    ControllerRecorder controller_recorder_partner = ControllerRecorder(&controller_partner, autonomous_train_poll_rate_ms);
+    ControllerRecorder controller_recorder_master = ControllerRecorder(&controller_master, opcontrol_delay_ms);
+    ControllerRecorder controller_recorder_partner = ControllerRecorder(&controller_partner, opcontrol_delay_ms);
 
     Task opcontrol = Task((task_fn_t)this->robot_opcontrol, (void*)this, t_train_autonomous_name);
     controller_recorder_master.start();

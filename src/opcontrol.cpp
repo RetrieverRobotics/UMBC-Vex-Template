@@ -23,5 +23,6 @@ void umbc::Robot::opcontrol(pros::Controller controller_master, pros::Controller
 
         // implement opcontrols
 
+        pros::Task::delay(this->opcontrol_delay_ms);
     }
 }
