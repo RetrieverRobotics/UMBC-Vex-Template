@@ -22,7 +22,7 @@ namespace umbc {
 class VController : public Controller {
 
 	private:
-	static constexpr char* t_update_controller_input_name = "vcontroller";
+	static constexpr char* t_update_controller_input_name = (char*)"vcontroller";
 
 	class Digital;
 
