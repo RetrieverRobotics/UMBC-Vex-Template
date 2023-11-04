@@ -12,6 +12,7 @@
 #include <fstream>
 #include <map>
 #include <cstdint>
+#include <string>
 
 using namespace pros;
 using namespace umbc;
@@ -124,19 +125,26 @@ std::int32_t umbc::VController::load(const char* file_path) {
 
     this->controller_input = std::queue<ControllerInput>();
 
+    string file_path_str = string(file_path);
+
     std::ifstream file(file_path, std::ifstream::binary);
     if (!file.good()) {
         file.close();
+        ERROR(file_path_str + " could not be opened");
         return 0;
     }
 
+    INFO("reading poll rate from " + file_path_str + "...");
     file.read((char*)(&(this->poll_rate_ms)), sizeof(this->poll_rate_ms));
     if (!file.good() || 0 == this->poll_rate_ms) {
         this->poll_rate_ms = 0;
         file.close();
+        ERROR("failed to read poll rate from " + file_path_str);
         return 0;
     }
+    INFO("poll rate is " + std::to_string(this->poll_rate_ms) + "ms");
 
+    INFO("loading in controller data from " + file_path_str + "...");
     while(1) {
 
         ControllerInput controller_input;
@@ -148,10 +156,13 @@ std::int32_t umbc::VController::load(const char* file_path) {
             this->poll_rate_ms = 0;
             this->controller_input = std::queue<ControllerInput>();
             file.close();
+            ERROR("failed to read controller data from " + file_path_str);
             return 0;
         }
         this->controller_input.push(controller_input);
-    } 
+    }
+    INFO("controller data from " + file_path_str + " loaded successfully");
+
 
     file.close();
     return 1;
@@ -165,6 +176,7 @@ void umbc::VController::start() {
 
     this->t_update_controller_input.reset(
         new Task((task_fn_t)this->update, (void*)this, this->t_update_controller_input_name));
+    INFO(string(t_update_controller_input_name) + " has started");
 }
 
 void umbc::VController::pause() {
@@ -173,6 +185,7 @@ void umbc::VController::pause() {
 
     if (nullptr != t_update) {
         t_update->suspend();
+        INFO(string(t_update_controller_input_name) + " is paused");
     }
 }
 
@@ -182,6 +195,7 @@ void umbc::VController::resume() {
 
     if (nullptr != t_update) {
         t_update->resume();
+        INFO(string(t_update_controller_input_name) + " has resumed");
     }
 }
 
@@ -191,9 +205,11 @@ void umbc::VController::stop() {
 
     if (nullptr != t_update) {
         t_update->remove();
+        INFO(string(t_update_controller_input_name) + " is stopped");
     }
 
     this->controller_input = std::queue<ControllerInput>();
+    INFO("virtual controller input queue is cleared");
 }
 
 void umbc::VController::wait_till_complete() {
@@ -202,6 +218,7 @@ void umbc::VController::wait_till_complete() {
 
     if (nullptr != t_update) {
         t_update->join();
+        INFO(string(t_update_controller_input_name) + " has completed");
     }
 }
 
