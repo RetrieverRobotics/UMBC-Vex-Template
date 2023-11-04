@@ -5,6 +5,8 @@
  * Competition.
  */
 
+ #include <iostream>
+
 #include "main.h"
 #include "api.h"
 #include "umbc.h"
