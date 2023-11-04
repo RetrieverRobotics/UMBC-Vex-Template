@@ -48,10 +48,10 @@ typedef enum {
 class Robot {
     
     private:
-    static constexpr char* match_autonomous_file_master = "/usd/autonomous_match.bin";
-    static constexpr char* match_autonomous_file_partner = "/usd/autonomous_match-partner.bin";
-    static constexpr char* skills_autonomous_file_master = "/usd/autonomous_skills.bin";
-    static constexpr char* skills_autonomous_file_partner = "/usd/autonomous_skills-partner.bin";
+    static constexpr char* match_autonomous_file_master = (char*)"/usd/autonomous_match.bin";
+    static constexpr char* match_autonomous_file_partner = (char*)"/usd/autonomous_match-partner.bin";
+    static constexpr char* skills_autonomous_file_master = (char*)"/usd/autonomous_skills.bin";
+    static constexpr char* skills_autonomous_file_partner = (char*)"/usd/autonomous_skills-partner.bin";
     static constexpr uint32_t match_autonomous_time_ms = 45000;
     static constexpr uint32_t skills_autonomous_time_ms = 75000;
     static constexpr uint32_t opcontrol_delay_ms = 10;
