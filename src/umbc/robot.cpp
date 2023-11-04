@@ -25,14 +25,17 @@ std::int32_t umbc::Robot::menu_competition() {
     pros::lcd::set_text(3, "1) Match");
     pros::lcd::set_text(4, "2) Skills");
 
+    INFO("Waiting for competition mode selection...");
     while(0 == btn_press) {
 
         btn_press = pros::lcd::read_buttons();
         
         if (LCD_BTN_LEFT == btn_press) {
             this->competition = COMPETITION_MATCH;
+            INFO("Match selected for competition mode");
         } else if (LCD_BTN_CENTER == btn_press) {
             this->competition = COMPETITION_SKILLS;
+            INFO("Skills selected for competition mode");
         } else {
             btn_press = 0;
         }
@@ -60,16 +63,20 @@ std::int32_t umbc::Robot::menu_mode() {
     pros::lcd::set_text(4, "2) Train Autonomous");
     pros::lcd::set_text(5, "3) Back");
     
+    INFO("Waiting for mode selection...");
     while(0 == btn_press) {
 
         btn_press = pros::lcd::read_buttons();
         
         if (LCD_BTN_LEFT == btn_press) {
             this->mode = MODE_COMPETITION;
+            INFO("Competition selected for mode");
         } else if (LCD_BTN_CENTER == btn_press) {
             this->mode = MODE_TRAIN_AUTONOMOUS;
+            INFO("Train autonomous selected for mode");
         } else if (LCD_BTN_RIGHT == btn_press) {
             menu_direction = -1;
+            INFO("Going back to prevoius menu");
         } else {
             btn_press = 0;
         }
@@ -96,16 +103,20 @@ std::int32_t umbc::Robot::menu_alliance() {
     pros::lcd::set_text(4, "2) Blue");
     pros::lcd::set_text(5, "3) Back");
     
+    INFO("Waiting for alliance selection...");
     while(0 == btn_press) {
 
         btn_press = pros::lcd::read_buttons();
         
         if (LCD_BTN_LEFT == btn_press) {
             this->alliance = ALLIANCE_RED;
+            INFO("Red alliance selected");
         } else if (LCD_BTN_CENTER == btn_press) {
             this->alliance = ALLIANCE_BLUE;
+            INFO("Blue alliance selected");
         } else if (LCD_BTN_RIGHT == btn_press) {
             menu_direction = -1;
+            INFO("Going back to prevoius menu");
         } else {
             btn_press = 0;
         }
@@ -132,16 +143,20 @@ std::int32_t umbc::Robot::menu_position() {
     pros::lcd::set_text(4, "2) Bravo");
     pros::lcd::set_text(5, "3) Back");
     
+    INFO("Waiting for starting position selection...");
     while(0 == btn_press) {
 
         btn_press = pros::lcd::read_buttons();
         
         if (LCD_BTN_LEFT == btn_press) {
             this->position = POSITION_ALPHA;
+            INFO("Starting position alpha selected");
         } else if (LCD_BTN_CENTER == btn_press) {
             this->position = POSITION_BRAVO;
+            INFO("Starting position alpha selected");
         } else if (LCD_BTN_RIGHT == btn_press) {
             menu_direction = -1;
+            INFO("Going back to prevoius menu");
         } else {
             btn_press = 0;
         }
@@ -206,6 +221,7 @@ void umbc::Robot::menu() {
     uint8_t current_sub_menu = MENU_COMPETITION;
 
     if (!pros::lcd::is_initialized()) {
+        ERROR("Failed to initialize LCD menu");
         return;
     }
 
@@ -234,6 +250,7 @@ void umbc::Robot::menu() {
     pros::lcd::set_text(1, "Selection Complete");
     pros::Task::delay(3000);
     pros::lcd::clear();
+    INFO("Menu selections completed");
 }
 
 void umbc::Robot::robot_opcontrol(Robot robot) {
