@@ -303,7 +303,7 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
 
 void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
 
-    char* t_train_autonomous_name =  (char*)"trainautonomous";
+    char* t_train_autonomous_name = (char*)"trainautonomous";
 
     ControllerRecorder controller_recorder_master = ControllerRecorder(&controller_master, opcontrol_delay_ms);
     ControllerRecorder controller_recorder_partner = ControllerRecorder(&controller_partner, opcontrol_delay_ms);

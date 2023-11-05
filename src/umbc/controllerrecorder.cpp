@@ -12,6 +12,7 @@
 #include <fstream>
 #include <queue>
 #include <cstdint>
+#include <string>
 
 using namespace pros;
 using namespace umbc;
@@ -30,12 +31,14 @@ void umbc::ControllerRecorder::record(void* ControllerRecorder) {
     umbc::ControllerRecorder* controller_recorder = (umbc::ControllerRecorder*)ControllerRecorder;
 
     if (0 == controller_recorder->poll_rate_ms) {
+        ERROR("invalid poll rate");
         return;
     }
 
     std::uint32_t now = pros::millis();
 
-    while (INT32_MAX > controller_recorder->controller_input.empty())
+    INFO("recording controller input...");
+    while (INT32_MAX > controller_recorder->controller_input.size())
     {
         ControllerInput controller_input;
 
@@ -77,6 +80,7 @@ void umbc::ControllerRecorder::record(void* ControllerRecorder) {
 
         pros::Task::delay_until(&now, controller_recorder->poll_rate_ms);
     }
+    INFO("max controller input recorded reached");
 
     return;
 }
@@ -84,32 +88,42 @@ void umbc::ControllerRecorder::record(void* ControllerRecorder) {
 std::int32_t umbc::ControllerRecorder::save(const char* file_path) {
 
     std::int32_t number_of_controller_inputs = this->controller_input.size();
+    
+    string file_path_str = string(file_path);
 
     if (0 == this->poll_rate_ms || this->controller_input.empty()) {
+        WARN("nothing to save to " + file_path_str);
         return -1;
     }
 
     std::ofstream file(file_path, std::ifstream::binary);
     if (!file.good()) {
         file.close();
+        ERROR("could not open " + file_path_str);
         return -1;
     }
 
+    INFO("writing poll rate to " + file_path_str + "...");
     file.write((char*)(&(this->poll_rate_ms)), sizeof(this->poll_rate_ms));
     if (!file.good()) {
         file.close();
+        ERROR("failed to write poll rate to " + file_path_str);
         return -1;
     }
+    INFO("poll rate written to " + file_path_str);
 
+    INFO("writing controller input to " + file_path_str + "...");
     while (!this->controller_input.empty()) {
         file.write((char*)(&(this->controller_input.front())), sizeof(umbc::ControllerInput));
         if (!file.good()) {
             file.close();
             this->reset();
+            ERROR("failed to write controller input to " + file_path_str);
             return -1;
         }
         this->controller_input.pop();
     }
+    INFO("controller input written to " + file_path_str);
     file.close();
 
     return number_of_controller_inputs;
@@ -119,6 +133,7 @@ void umbc::ControllerRecorder::start() {
 
     this->t_record_controller_input.reset(
         new Task((task_fn_t)this->record, (void*)this, this->t_record_controller_input_name));
+    INFO(string(t_record_controller_input_name) + " has started");
 }
 
 void umbc::ControllerRecorder::pause() {
@@ -127,6 +142,7 @@ void umbc::ControllerRecorder::pause() {
 
     if (nullptr != t_record) {
         t_record->suspend();
+        INFO(string(t_record_controller_input_name) + " is paused");
     }
 }
 
@@ -136,6 +152,7 @@ void umbc::ControllerRecorder::resume() {
 
     if (nullptr != t_record) {
         t_record->resume();
+        INFO(string(t_record_controller_input_name) + " has resumed");
     }
 }
 
@@ -145,6 +162,7 @@ void umbc::ControllerRecorder::stop() {
 
     if (nullptr != t_record) {
         t_record->remove();
+        INFO(string(t_record_controller_input_name) + " is stopped");
     }
 }
 
