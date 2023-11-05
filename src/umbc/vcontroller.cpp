@@ -130,7 +130,7 @@ std::int32_t umbc::VController::load(const char* file_path) {
     std::ifstream file(file_path, std::ifstream::binary);
     if (!file.good()) {
         file.close();
-        ERROR(file_path_str + " could not be opened");
+        ERROR("could not open " + file_path_str);
         return 0;
     }
 
