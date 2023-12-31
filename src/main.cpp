@@ -26,8 +26,13 @@ umbc::Robot robot = Robot();
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+
+	INFO("initializing robot...");
+
 	pros::lcd::initialize();
 	robot.menu();
+
+	INFO("robot initialized");
 }
 
 /**
@@ -37,8 +42,12 @@ void initialize() {
  */
 void disabled() {
 
+	INFO("disabling robot...");
+
 	pros::lcd::clear();
 	pros::lcd::set_text(1, "Robot Disabled");
+
+	INFO("robot disabled");
 }
 
 /**
@@ -52,8 +61,12 @@ void disabled() {
  */
 void competition_initialize() {
 	
+	INFO("performing competition initialization...");
+
 	pros::lcd::clear();
 	pros::lcd::set_text(1, "Connected to Field Controller");
+
+	INFO("competition initialization completed");
 }
 
 /**
@@ -69,10 +82,14 @@ void competition_initialize() {
  */
 void autonomous() {
 
+	INFO("performing autonomous routine...");
+
 	pros::lcd::clear();
 	pros::lcd::set_text(1, "Autonomous Active");
 	robot.autonomous(PARTNER_CONTROLLER);
 	pros::lcd::clear();
+	
+	INFO("autonomous routine completed");
 }
 
 /**
