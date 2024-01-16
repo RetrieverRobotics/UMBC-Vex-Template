@@ -303,38 +303,68 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
 
 void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
 
+    INFO("autonomous training active");
+
     char* t_train_autonomous_name = (char*)"trainautonomous";
 
     ControllerRecorder controller_recorder_master = ControllerRecorder(&controller_master, opcontrol_delay_ms);
     ControllerRecorder controller_recorder_partner = ControllerRecorder(&controller_partner, opcontrol_delay_ms);
 
+    INFO("starting opcontrol task...");
     Task opcontrol = Task((task_fn_t)this->robot_opcontrol, (void*)this, t_train_autonomous_name);
+    INFO("opcontrol task started");
+
+    INFO("starting master controller recording...");
     controller_recorder_master.start();
+    INFO("recording master controller has begun");
     if (record_partner_controller) {
+        INFO("starting partner controller recording...");
         controller_recorder_partner.start();
+        INFO("recording partner controller has begun");
     }
 
     if (COMPETITION_SKILLS == this->competition) {
-        pros::Task::delay(this->match_autonomous_time_ms);
+        INFO("setting task delay for skills autonomous time...");
+        pros::Task::delay(this->skills_autonomous_time_ms);
+        INFO("task delay set to " << this->skills_autonomous_time_ms << " ms");
     } else {
+        INFO("setting task delay for match autonomous time...");
         pros::Task::delay(this->match_autonomous_time_ms);
+        INFO("task delay set to " << this->match_autonomous_time_ms << " ms");
     }
 
+    INFO("terminating opcontrol task...");
     opcontrol.remove();
+    INFO("opcontrol task has been terminated");
+
+    INFO("stopping master controller recording...");
     controller_recorder_master.stop();
+    INFO("master controller recording stopped");
+
     if (record_partner_controller) {
+        INFO("stopping partner controller recording...");
         controller_recorder_partner.stop();
+        INFO("partner controller recording stopped");
     }
 
+    INFO("saving master controller file...");
     if (COMPETITION_SKILLS == this->competition) {
         controller_recorder_master.save(this->skills_autonomous_file_master);
+        INFO("master controller file saved to " << this->skills_autonomous_file_master);
         if (record_partner_controller) {
+            INFO("saving partner controller file...");
             controller_recorder_partner.save(this->skills_autonomous_file_partner);
+            INFO("partner controller file saved to " << this->skills_autonomous_file_partner);
         }
     } else {
         controller_recorder_master.save(this->match_autonomous_file_master);
+        INFO("master controller file save to " << this->match_autonomous_file_master);
         if (record_partner_controller) {
+            INFO("saving partner controller file...");
             controller_recorder_partner.save(this->match_autonomous_file_partner);
+            INFO("partner controller file saved to " << this->match_autonomous_file_partner);
         }
     }
+
+    INFO("autonomous training completed");
 }
