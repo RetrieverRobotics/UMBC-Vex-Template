@@ -92,92 +92,10 @@ std::int32_t umbc::Robot::menu_mode() {
     return menu_direction;
 }
 
-std::int32_t umbc::Robot::menu_alliance() {
-
-    std::int32_t menu_direction = 1;
-    std::uint8_t btn_press = 0;
-
-    pros::lcd::clear();
-    pros::lcd::set_text(1, "Select Alliance");
-    pros::lcd::set_text(3, "1) Red");
-    pros::lcd::set_text(4, "2) Blue");
-    pros::lcd::set_text(5, "3) Back");
-    
-    INFO("waiting for alliance selection...");
-    while(0 == btn_press) {
-
-        btn_press = pros::lcd::read_buttons();
-        
-        if (LCD_BTN_LEFT == btn_press) {
-            this->alliance = ALLIANCE_RED;
-            INFO("red alliance selected");
-        } else if (LCD_BTN_CENTER == btn_press) {
-            this->alliance = ALLIANCE_BLUE;
-            INFO("blue alliance selected");
-        } else if (LCD_BTN_RIGHT == btn_press) {
-            menu_direction = -1;
-            INFO("going back to prevoius menu");
-        } else {
-            btn_press = 0;
-        }
-
-        pros::Task::delay(10);
-    }
-
-    while (0 != pros::lcd::read_buttons()) {
-        pros::Task::delay(10);
-    }
-
-    pros::lcd::clear();
-    return menu_direction;
-}
-
-std::int32_t umbc::Robot::menu_position() {
-
-    std::int32_t menu_direction = 1;
-    std::uint8_t btn_press = 0;
-
-    pros::lcd::clear();
-    pros::lcd::set_text(1, "Select Starting Position");
-    pros::lcd::set_text(3, "1) Alpha");
-    pros::lcd::set_text(4, "2) Bravo");
-    pros::lcd::set_text(5, "3) Back");
-    
-    INFO("waiting for starting position selection...");
-    while(0 == btn_press) {
-
-        btn_press = pros::lcd::read_buttons();
-        
-        if (LCD_BTN_LEFT == btn_press) {
-            this->position = POSITION_ALPHA;
-            INFO("starting position alpha selected");
-        } else if (LCD_BTN_CENTER == btn_press) {
-            this->position = POSITION_BRAVO;
-            INFO("starting position alpha selected");
-        } else if (LCD_BTN_RIGHT == btn_press) {
-            menu_direction = -1;
-            INFO("going back to prevoius menu");
-        } else {
-            btn_press = 0;
-        }
-
-        pros::Task::delay(10);
-    }
-
-    while (0 != pros::lcd::read_buttons()) {
-        pros::Task::delay(10);
-    }
-
-    pros::lcd::clear();
-    return menu_direction;
-}
-
 umbc::Robot::Robot() {
 
     this->competition = COMPETITION_MATCH;
     this->mode = MODE_COMPETITION;
-    this->alliance = ALLIANCE_RED;
-    this->position = POSITION_ALPHA;
 }
 
 void umbc::Robot::set_controller_master(pros::Controller controller_master) {
@@ -204,20 +122,9 @@ umbc::competition umbc::Robot::get_competition() {
 umbc::mode umbc::Robot::get_mode() {
     return this->mode;
 }
-    
-
-umbc::alliance umbc::Robot::get_alliance() {
-    return this->alliance;
-}
-    
-
-umbc::position umbc::Robot::get_position() {
-    return this->position;
-}
 
 void umbc::Robot::menu() {
 
-    const uint8_t last_sub_menu = MENU_POSITION;
     uint8_t current_sub_menu = MENU_COMPETITION;
 
     if (!pros::lcd::is_initialized()) {
@@ -227,7 +134,7 @@ void umbc::Robot::menu() {
 
     pros::lcd::clear();
 
-    while (MENU_POSITION >= current_sub_menu) {
+    while (MENU_MAX > current_sub_menu) {
 
         switch (current_sub_menu) {
             case MENU_COMPETITION:
@@ -236,11 +143,6 @@ void umbc::Robot::menu() {
             case MENU_MODE:
                 current_sub_menu += menu_mode();
             break;
-            case MENU_ALLIANCE:
-                current_sub_menu += menu_alliance();
-            break;
-            case MENU_POSITION:
-                current_sub_menu += menu_position();
             default:
                 break;
         }
