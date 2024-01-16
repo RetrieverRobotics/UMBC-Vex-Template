@@ -260,6 +260,8 @@ void umbc::Robot::robot_opcontrol(Robot robot) {
 
 void umbc::Robot::autonomous(uint32_t include_partner_controller) {
 
+    INFO("autonomous active");
+
     char* t_autonomous_name =  (char*)"autonomous";
 
     pros::Controller controller_master_prev = this->get_controller_master();
@@ -270,35 +272,61 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
 
     this->controller_master = vcontroller_master;
     this->controller_partner = vcontroller_partner;
+    INFO("controller inputs set to virtual controllers");
 
     if (COMPETITION_SKILLS == this->competition) {
-
+        INFO("loading skills input file for virtual master controller...");
         vcontroller_master.load(this->skills_autonomous_file_master);
+        INFO("loaded " << skills_autonomous_file_master << " as input file for virtual master controller");
         if (include_partner_controller) {
+            INFO("loading skills input file for virtual partner controller...");
             vcontroller_partner.load(this->skills_autonomous_file_partner);
+            INFO("loaded " << skills_autonomous_file_partner << " as input file for virtual partner controller");
         }
     } else {
-
+        INFO("loading match input file for virtual master controller...");
         vcontroller_master.load(this->match_autonomous_file_master);
+        INFO("loaded " << match_autonomous_file_master << " as input file for virtual master controller");
         if (include_partner_controller) {
+            INFO("loading match input file for virtual partner controller...");
             vcontroller_partner.load(this->match_autonomous_file_partner);
+            INFO("loaded " << match_autonomous_file_partner << " as input file for virtual partner controller");
         }
     }
 
+    INFO("starting opcontrol task...");
     Task opcontrol = Task((task_fn_t)this->robot_opcontrol, (void*)this, t_autonomous_name);
+    INFO("opcontrol task started");
+
+    INFO("starting task for virtual master controller...");
     vcontroller_master.start();
+    INFO("virtual master controller task started");
+
     if (include_partner_controller) {
+        INFO("starting task for virtaul partner controller...");
         vcontroller_partner.start();
+        INFO("virtual partner controller task started");
     }
 
+    INFO("waiting for virtaul master controller input to complete...");
     vcontroller_master.wait_till_complete();
+    INFO("virtaul master controller input completed");
+
     if (include_partner_controller) {
+        INFO("waiting for virtaul partner controller input to complete...");
         vcontroller_partner.wait_till_complete();
+        INFO("virtaul partner controller input completed");
     }
+
+    INFO("terminating opcontrol task...");
     opcontrol.remove();
+    INFO("opcontrol task has been terminated");
 
     this->controller_master = controller_master_prev;
     this->controller_partner = controller_partner_prev;
+    INFO("controller inputs set to physical controllers...");
+
+    INFO("autonomous completed");
 }
 
 void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
