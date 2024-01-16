@@ -29,20 +29,9 @@ typedef enum {
 } mode;
 
 typedef enum {
-    ALLIANCE_RED = 0,
-    ALLIANCE_BLUE = 1
-} alliance;
-
-typedef enum {
-    POSITION_ALPHA = 0,
-    POSITION_BRAVO = 1
-} position;
-
-typedef enum {
     MENU_COMPETITION = 0,
     MENU_MODE = 1,
-    MENU_ALLIANCE = 2,
-    MENU_POSITION = 3
+    MENU_MAX
 } sub_menu;
 
 class Robot {
@@ -58,8 +47,6 @@ class Robot {
 
     umbc::competition competition;
     umbc::mode mode;
-    umbc::alliance alliance;
-    umbc::position position;
 
     pros::Controller controller_master = pros::Controller(E_CONTROLLER_MASTER);
     pros::Controller controller_partner = pros::Controller(E_CONTROLLER_PARTNER);
@@ -77,20 +64,6 @@ class Robot {
      * @returns 1 if a selection was made, otherwise -1.
      */
     std::int32_t menu_mode();
-
-    /**
-     * Menu to select the alliance using the LLEMU.
-     * 
-     * @returns 1 if a selection was made, otherwise -1.
-     */
-    std::int32_t menu_alliance();
-
-    /**
-     * Menu to select the starting position using the LLEMU.
-     * 
-     * @returns 1 if a selection was made, otherwise -1.
-     */
-    std::int32_t menu_position();
 
     /**
      * Allows operator to manually control the robot via a controller. Used
@@ -146,20 +119,6 @@ class Robot {
      * @return the robot mode setting
     */
     umbc::mode get_mode();
-    
-    /**
-     * Retrieve the alliance setting.
-     * 
-     * @return the alliance setting
-    */
-    umbc::alliance get_alliance();
-    
-    /**
-     * Retrieve the starting position setting.
-     * 
-     * @return the starting position setting
-    */
-    umbc::position get_position();
 
     /**
      * Menu for selecting mode, competition, alliance, and starting
