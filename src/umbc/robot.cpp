@@ -260,6 +260,8 @@ void umbc::Robot::robot_opcontrol(Robot robot) {
 
 void umbc::Robot::autonomous(uint32_t include_partner_controller) {
 
+    INFO("autonomous active");
+
     char* t_autonomous_name =  (char*)"autonomous";
 
     pros::Controller controller_master_prev = this->get_controller_master();
@@ -270,71 +272,127 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
 
     this->controller_master = vcontroller_master;
     this->controller_partner = vcontroller_partner;
+    INFO("controller inputs set to virtual controllers");
 
     if (COMPETITION_SKILLS == this->competition) {
-
+        INFO("loading skills input file for virtual master controller...");
         vcontroller_master.load(this->skills_autonomous_file_master);
+        INFO("loaded " << skills_autonomous_file_master << " as input file for virtual master controller");
         if (include_partner_controller) {
+            INFO("loading skills input file for virtual partner controller...");
             vcontroller_partner.load(this->skills_autonomous_file_partner);
+            INFO("loaded " << skills_autonomous_file_partner << " as input file for virtual partner controller");
         }
     } else {
-
+        INFO("loading match input file for virtual master controller...");
         vcontroller_master.load(this->match_autonomous_file_master);
+        INFO("loaded " << match_autonomous_file_master << " as input file for virtual master controller");
         if (include_partner_controller) {
+            INFO("loading match input file for virtual partner controller...");
             vcontroller_partner.load(this->match_autonomous_file_partner);
+            INFO("loaded " << match_autonomous_file_partner << " as input file for virtual partner controller");
         }
     }
 
+    INFO("starting opcontrol task...");
     Task opcontrol = Task((task_fn_t)this->robot_opcontrol, (void*)this, t_autonomous_name);
+    INFO("opcontrol task started");
+
+    INFO("starting task for virtual master controller...");
     vcontroller_master.start();
+    INFO("virtual master controller task started");
+
     if (include_partner_controller) {
+        INFO("starting task for virtaul partner controller...");
         vcontroller_partner.start();
+        INFO("virtual partner controller task started");
     }
 
+    INFO("waiting for virtaul master controller input to complete...");
     vcontroller_master.wait_till_complete();
+    INFO("virtaul master controller input completed");
+
     if (include_partner_controller) {
+        INFO("waiting for virtaul partner controller input to complete...");
         vcontroller_partner.wait_till_complete();
+        INFO("virtaul partner controller input completed");
     }
+
+    INFO("terminating opcontrol task...");
     opcontrol.remove();
+    INFO("opcontrol task has been terminated");
 
     this->controller_master = controller_master_prev;
     this->controller_partner = controller_partner_prev;
+    INFO("controller inputs set to physical controllers...");
+
+    INFO("autonomous completed");
 }
 
 void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
+
+    INFO("autonomous training active");
 
     char* t_train_autonomous_name = (char*)"trainautonomous";
 
     ControllerRecorder controller_recorder_master = ControllerRecorder(&controller_master, opcontrol_delay_ms);
     ControllerRecorder controller_recorder_partner = ControllerRecorder(&controller_partner, opcontrol_delay_ms);
 
+    INFO("starting opcontrol task...");
     Task opcontrol = Task((task_fn_t)this->robot_opcontrol, (void*)this, t_train_autonomous_name);
+    INFO("opcontrol task started");
+
+    INFO("starting master controller recording...");
     controller_recorder_master.start();
+    INFO("recording master controller has begun");
     if (record_partner_controller) {
+        INFO("starting partner controller recording...");
         controller_recorder_partner.start();
+        INFO("recording partner controller has begun");
     }
 
     if (COMPETITION_SKILLS == this->competition) {
-        pros::Task::delay(this->match_autonomous_time_ms);
+        INFO("setting task delay for skills autonomous time...");
+        pros::Task::delay(this->skills_autonomous_time_ms);
+        INFO("task delay set to " << this->skills_autonomous_time_ms << " ms");
     } else {
+        INFO("setting task delay for match autonomous time...");
         pros::Task::delay(this->match_autonomous_time_ms);
+        INFO("task delay set to " << this->match_autonomous_time_ms << " ms");
     }
 
+    INFO("terminating opcontrol task...");
     opcontrol.remove();
+    INFO("opcontrol task has been terminated");
+
+    INFO("stopping master controller recording...");
     controller_recorder_master.stop();
+    INFO("master controller recording stopped");
+
     if (record_partner_controller) {
+        INFO("stopping partner controller recording...");
         controller_recorder_partner.stop();
+        INFO("partner controller recording stopped");
     }
 
+    INFO("saving master controller file...");
     if (COMPETITION_SKILLS == this->competition) {
         controller_recorder_master.save(this->skills_autonomous_file_master);
+        INFO("master controller file saved to " << this->skills_autonomous_file_master);
         if (record_partner_controller) {
+            INFO("saving partner controller file...");
             controller_recorder_partner.save(this->skills_autonomous_file_partner);
+            INFO("partner controller file saved to " << this->skills_autonomous_file_partner);
         }
     } else {
         controller_recorder_master.save(this->match_autonomous_file_master);
+        INFO("master controller file save to " << this->match_autonomous_file_master);
         if (record_partner_controller) {
+            INFO("saving partner controller file...");
             controller_recorder_partner.save(this->match_autonomous_file_partner);
+            INFO("partner controller file saved to " << this->match_autonomous_file_partner);
         }
     }
+
+    INFO("autonomous training completed");
 }
