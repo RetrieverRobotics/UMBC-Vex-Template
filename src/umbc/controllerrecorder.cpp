@@ -21,7 +21,7 @@ using namespace std;
 umbc::ControllerRecorder::ControllerRecorder(pros::Controller* controller, std::uint16_t poll_rate_ms) {
 
     this->controller = controller;
-    this->poll_rate_ms = 0;
+    this->poll_rate_ms = poll_rate_ms;
     this->controller_input = std::queue<ControllerInput>();
     this->t_record_controller_input.reset(nullptr);
 }
