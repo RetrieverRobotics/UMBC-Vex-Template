@@ -288,7 +288,7 @@ void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
         }
     } else {
         controller_recorder_master.save(this->match_autonomous_file_master);
-        INFO("master controller file save to " << this->match_autonomous_file_master);
+        INFO("master controller file saved to " << this->match_autonomous_file_master);
         if (record_partner_controller) {
             INFO("saving partner controller file...");
             controller_recorder_partner.save(this->match_autonomous_file_partner);
@@ -296,5 +296,5 @@ void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
         }
     }
 
-    INFO("autonomous training completed");
+    INFO("autonomous training complete");
 }

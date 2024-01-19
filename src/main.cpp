@@ -115,8 +115,10 @@ void opcontrol() {
 			pros::lcd::set_text(1, "Autonomous Training Active");
 			robot.train_autonomous(PARTNER_CONTROLLER);
 			pros::lcd::clear();
-			pros::lcd::set_text(1, "Autonomous Training Complete");
-			INFO("autonomous training complete");
+    		pros::lcd::set_text(1, "Autonomous Training Complete");
+    		INFO("autonomous training complete");
+			delay(3000);
+			initialize();
 		} else {
 			pros::lcd::set_text(1, "No SD Card Detected");
 			ERROR("autonomous training failed; no SD Card detected");
