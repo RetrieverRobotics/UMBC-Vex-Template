@@ -150,7 +150,7 @@ void umbc::Robot::menu() {
 
     pros::lcd::clear();
     pros::lcd::set_text(1, "Selection Complete");
-    pros::Task::delay(3000);
+    pros::Task::delay(MSG_DELAY_MS);
     pros::lcd::clear();
     INFO("menu selections completed");
 }
