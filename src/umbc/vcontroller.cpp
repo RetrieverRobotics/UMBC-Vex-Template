@@ -68,11 +68,7 @@ std::int32_t umbc::VController::is_connected() {
 }
 
 std::int32_t umbc::VController::get_analog(controller_analog_e_t channel) {
-
-    if (this->controller_input.empty()) {
-        return 0;
-    }
-    return this->controller_input.front().get_analog(channel);
+    return this->controller_input.empty() ? 0 : this->controller_input.front().get_analog(channel);
 }
 
 std::int32_t umbc::VController::get_battery_capacity() {
@@ -84,21 +80,13 @@ std::int32_t umbc::VController::get_battery_level() {
 }
 
 std::int32_t umbc::VController::get_digital(controller_digital_e_t button) {
-
-    if (this->controller_input.empty()) {
-        return 0;
-    }
-    return this->controller_input.front().get_digital(button);
+    return this->controller_input.empty() ? 0 : this->controller_input.front().get_digital(button);
 }
 
 std::int32_t umbc::VController::get_digital_new_press(controller_digital_e_t button) {
 
     std::map<controller_digital_e_t, Digital>::iterator digital = this->digitals.find(button);
-
-    if (digital == this->digitals.end()) {
-        return 0;
-    }
-    return digital->second.get_new_press();
+    return (digital == this->digitals.end()) ? 0 : digital->second.get_new_press();
 }
 
 std::int32_t umbc::VController::set_text(std::uint8_t line, std::uint8_t col, const char* str) {
@@ -163,7 +151,6 @@ std::int32_t umbc::VController::load(const char* file_path) {
     }
     INFO("controller data from " + file_path_str + " loaded successfully");
 
-
     file.close();
     return 1;
 }
@@ -184,8 +171,12 @@ void umbc::VController::pause() {
     Task* t_update = this->t_update_controller_input.get();
 
     if (nullptr != t_update) {
-        t_update->suspend();
-        INFO(string(t_update_controller_input_name) + " is paused");
+        try {
+            t_update->suspend();
+            INFO(string(t_update_controller_input_name) + " is paused");
+        } catch (...) {
+            ERROR("failed to pause " + string(t_update_controller_input_name));
+        }
     }
 }
 
@@ -194,8 +185,12 @@ void umbc::VController::resume() {
     Task* t_update = this->t_update_controller_input.get();
 
     if (nullptr != t_update) {
-        t_update->resume();
-        INFO(string(t_update_controller_input_name) + " has resumed");
+        try {
+            t_update->resume();
+            INFO(string(t_update_controller_input_name) + " has resumed");
+        } catch (...) {
+            ERROR("failed to resume " + string(t_update_controller_input_name));
+        }
     }
 }
 
@@ -204,8 +199,12 @@ void umbc::VController::stop() {
     Task* t_update = this->t_update_controller_input.get();
 
     if (nullptr != t_update) {
-        t_update->remove();
-        INFO(string(t_update_controller_input_name) + " is stopped");
+        try {
+            t_update->remove();
+            INFO(string(t_update_controller_input_name) + " is stopped");
+        } catch (...) {
+            ERROR("failed to stop " + string(t_update_controller_input_name));
+        }
     }
 
     this->controller_input = std::queue<ControllerInput>();
@@ -217,8 +216,12 @@ void umbc::VController::wait_till_complete() {
     Task* t_update = this->t_update_controller_input.get();
 
     if (nullptr != t_update) {
-        t_update->join();
-        INFO(string(t_update_controller_input_name) + " has completed");
+        try {
+            t_update->join();
+            INFO(string(t_update_controller_input_name) + " has completed");
+        } catch (...) {
+            ERROR("failed to complete " + string(t_update_controller_input_name));
+        }
     }
 }
 
