@@ -171,8 +171,12 @@ void umbc::VController::pause() {
     Task* t_update = this->t_update_controller_input.get();
 
     if (nullptr != t_update) {
-        t_update->suspend();
-        INFO(string(t_update_controller_input_name) + " is paused");
+        try {
+            t_update->suspend();
+            INFO(string(t_update_controller_input_name) + " is paused");
+        } catch (...) {
+            ERROR("failed to pause " + string(t_update_controller_input_name));
+        }
     }
 }
 
@@ -181,8 +185,12 @@ void umbc::VController::resume() {
     Task* t_update = this->t_update_controller_input.get();
 
     if (nullptr != t_update) {
-        t_update->resume();
-        INFO(string(t_update_controller_input_name) + " has resumed");
+        try {
+            t_update->resume();
+            INFO(string(t_update_controller_input_name) + " has resumed");
+        } catch (...) {
+            ERROR("failed to resume " + string(t_update_controller_input_name));
+        }
     }
 }
 
@@ -191,8 +199,12 @@ void umbc::VController::stop() {
     Task* t_update = this->t_update_controller_input.get();
 
     if (nullptr != t_update) {
-        t_update->remove();
-        INFO(string(t_update_controller_input_name) + " is stopped");
+        try {
+            t_update->remove();
+            INFO(string(t_update_controller_input_name) + " is stopped");
+        } catch (...) {
+            ERROR("failed to stop " + string(t_update_controller_input_name));
+        }
     }
 
     this->controller_input = std::queue<ControllerInput>();
@@ -204,8 +216,12 @@ void umbc::VController::wait_till_complete() {
     Task* t_update = this->t_update_controller_input.get();
 
     if (nullptr != t_update) {
-        t_update->join();
-        INFO(string(t_update_controller_input_name) + " has completed");
+        try {
+            t_update->join();
+            INFO(string(t_update_controller_input_name) + " has completed");
+        } catch (...) {
+            ERROR("failed to complete " + string(t_update_controller_input_name));
+        }
     }
 }
 
