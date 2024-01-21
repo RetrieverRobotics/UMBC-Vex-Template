@@ -68,11 +68,7 @@ std::int32_t umbc::VController::is_connected() {
 }
 
 std::int32_t umbc::VController::get_analog(controller_analog_e_t channel) {
-
-    if (this->controller_input.empty()) {
-        return 0;
-    }
-    return this->controller_input.front().get_analog(channel);
+    return this->controller_input.empty() ? 0 : this->controller_input.front().get_analog(channel);
 }
 
 std::int32_t umbc::VController::get_battery_capacity() {
@@ -84,21 +80,13 @@ std::int32_t umbc::VController::get_battery_level() {
 }
 
 std::int32_t umbc::VController::get_digital(controller_digital_e_t button) {
-
-    if (this->controller_input.empty()) {
-        return 0;
-    }
-    return this->controller_input.front().get_digital(button);
+    return this->controller_input.empty() ? 0 : this->controller_input.front().get_digital(button);
 }
 
 std::int32_t umbc::VController::get_digital_new_press(controller_digital_e_t button) {
 
     std::map<controller_digital_e_t, Digital>::iterator digital = this->digitals.find(button);
-
-    if (digital == this->digitals.end()) {
-        return 0;
-    }
-    return digital->second.get_new_press();
+    return (digital == this->digitals.end()) ? 0 : digital->second.get_new_press();
 }
 
 std::int32_t umbc::VController::set_text(std::uint8_t line, std::uint8_t col, const char* str) {
@@ -162,7 +150,6 @@ std::int32_t umbc::VController::load(const char* file_path) {
         this->controller_input.push(controller_input);
     }
     INFO("controller data from " + file_path_str + " loaded successfully");
-
 
     file.close();
     return 1;
