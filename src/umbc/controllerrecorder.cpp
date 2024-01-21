@@ -141,8 +141,13 @@ void umbc::ControllerRecorder::pause() {
     Task* t_record = this->t_record_controller_input.get();
 
     if (nullptr != t_record) {
-        t_record->suspend();
-        INFO(string(t_record_controller_input_name) + " is paused");
+        try {
+            t_record->suspend();
+            INFO(string(t_record_controller_input_name) + " is paused");
+        }
+        catch (...) {
+            ERROR("failed to suspend " + string(t_record_controller_input_name));
+        }
     }
 }
 
@@ -151,8 +156,12 @@ void umbc::ControllerRecorder::resume() {
     Task* t_record = this->t_record_controller_input.get();
 
     if (nullptr != t_record) {
-        t_record->resume();
-        INFO(string(t_record_controller_input_name) + " has resumed");
+        try {
+            t_record->resume();
+            INFO(string(t_record_controller_input_name) + " has resumed");
+        } catch (...) {
+            ERROR("failed to resume " +  string(t_record_controller_input_name));
+        }
     }
 }
 
@@ -161,8 +170,12 @@ void umbc::ControllerRecorder::stop() {
     Task* t_record = this->t_record_controller_input.get();
 
     if (nullptr != t_record) {
-        t_record->remove();
-        INFO(string(t_record_controller_input_name) + " is stopped");
+        try {
+            t_record->remove();
+            INFO(string(t_record_controller_input_name) + " is stopped");
+        } catch (...) {
+            ERROR("failed to stop " + string(t_record_controller_input_name));
+        }
     }
 }
 
@@ -174,11 +187,7 @@ std::int32_t umbc::ControllerRecorder::isRecording() {
 
     Task* t_record = this->t_record_controller_input.get();
 
-    if (nullptr == t_record) {
-        return 0;
-    }
-
-    return this->t_record_controller_input.get()->get_state() == E_TASK_STATE_RUNNING;
+    return (nullptr == t_record) ? 0 : t_record->get_state() == E_TASK_STATE_RUNNING;
 }
 
 std::int32_t umbc::ControllerRecorder::hasControllerInput() {
