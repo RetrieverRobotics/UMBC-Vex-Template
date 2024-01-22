@@ -205,19 +205,19 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
     INFO("virtual master controller task started");
 
     if (include_partner_controller) {
-        INFO("starting task for virtaul partner controller...");
+        INFO("starting task for virtual partner controller...");
         vcontroller_partner.start();
         INFO("virtual partner controller task started");
     }
 
-    INFO("waiting for virtaul master controller input to complete...");
+    INFO("waiting for virtual master controller input to complete...");
     vcontroller_master.wait_till_complete();
-    INFO("virtaul master controller input completed");
+    INFO("virtual master controller input completed");
 
     if (include_partner_controller) {
-        INFO("waiting for virtaul partner controller input to complete...");
+        INFO("waiting for virtual partner controller input to complete...");
         vcontroller_partner.wait_till_complete();
-        INFO("virtaul partner controller input completed");
+        INFO("virtual partner controller input completed");
     }
 
     INFO("terminating opcontrol task...");
