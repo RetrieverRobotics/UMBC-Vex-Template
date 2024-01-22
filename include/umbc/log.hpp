@@ -1,7 +1,8 @@
 /**
  * \file umbc/log.hpp
  *
- * Contains defintions for logging to the pros terminal
+ * Contains definitions for logging to the pros terminal. To disable
+ * commenting, ensure LOG is not defined.
  */
 
 #ifndef _UMBC_LOG_HPP_
