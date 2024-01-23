@@ -117,7 +117,7 @@ void opcontrol() {
 
 		if (MODE_TRAIN_AUTONOMOUS == robot.get_mode()) {
 			INFO("autonomous training starting...");
-			if (usd::is_installed()) {
+			if (pros::usd::is_installed()) {
 				pros::lcd::set_text(1, "Autonomous Training Active");
 				robot.train_autonomous(PARTNER_CONTROLLER);
 				pros::lcd::clear();
@@ -126,11 +126,12 @@ void opcontrol() {
 				pros::Task::delay(MSG_DELAY_MS);
 				initialize();
 			} else {
-				pros::lcd::set_text(1, "No SD Card Detected");
 				ERROR("autonomous training failed; no SD Card detected");
-				INFO("aborting program in " << MSG_DELAY_MS << " ms...");
-				pros::Task::delay(MSG_DELAY_MS);
-				abort();
+				pros::lcd::clear();
+				pros::lcd::set_text(1, "No SD Card Detected!");
+				pros::lcd::set_text(3, "Power off V5 Brain and insert");
+				pros::lcd::set_text(4, "SD Card.");
+				return;
 			}
 		} else {
 			pros::lcd::set_text(1, "Opcontrol Active");
