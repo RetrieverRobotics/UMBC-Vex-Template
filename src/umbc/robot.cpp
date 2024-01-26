@@ -155,9 +155,8 @@ void umbc::Robot::menu() {
     INFO("menu selections completed");
 }
 
-void umbc::Robot::robot_opcontrol(Robot robot) {
-
-    robot.opcontrol(robot.get_controller_master(), robot.get_controller_partner());
+void umbc::Robot::robot_opcontrol(Robot* robot) {
+    robot->opcontrol(robot->get_controller_master(), robot->get_controller_partner());
 }
 
 void umbc::Robot::autonomous(uint32_t include_partner_controller) {
