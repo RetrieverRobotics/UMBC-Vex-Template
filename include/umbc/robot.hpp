@@ -68,8 +68,12 @@ class Robot {
     /**
      * Allows operator to manually control the robot via a controller. Used
      * for training autonomous.
+     * 
+     * @param robot
+     *          The type for this parameter must be Robot*.
+     *          Intended to be 'this' pointer.
      */
-    static void robot_opcontrol(Robot robot);
+    static void robot_opcontrol(Robot* robot);
 
     public:
     
