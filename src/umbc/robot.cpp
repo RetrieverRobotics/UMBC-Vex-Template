@@ -100,12 +100,12 @@ umbc::Robot::Robot() {
 
 void umbc::Robot::set_controllers_to_physical() {
     this->controller_master = &(this->pcontroller_master);
-    this->controller_master = &(this->pcontroller_partner);
+    this->controller_partner = &(this->pcontroller_partner);
 }
 
 void umbc::Robot::set_controllers_to_virtual() {
     this->controller_master = &(this->vcontroller_master);
-    this->controller_master = &(this->vcontroller_partner);
+    this->controller_partner = &(this->vcontroller_partner);
 }
 
 umbc::competition umbc::Robot::get_competition() {
