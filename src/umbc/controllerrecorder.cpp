@@ -18,7 +18,7 @@ using namespace pros;
 using namespace umbc;
 using namespace std;
 
-umbc::ControllerRecorder::ControllerRecorder(pros::Controller* controller, std::uint16_t poll_rate_ms) {
+umbc::ControllerRecorder::ControllerRecorder(umbc::Controller* controller, std::uint16_t poll_rate_ms) {
 
     this->controller = controller;
     this->poll_rate_ms = poll_rate_ms;

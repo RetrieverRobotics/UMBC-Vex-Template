@@ -18,7 +18,7 @@ using namespace pros;
 using namespace umbc;
 using namespace std;
 
-umbc::VController::VController():Controller(E_CONTROLLER_MASTER) {
+umbc::VController::VController() {
 
     this->poll_rate_ms = 0;
     this->controller_input = std::queue<ControllerInput>();
@@ -88,6 +88,10 @@ std::int32_t umbc::VController::get_digital_new_press(controller_digital_e_t but
 
     std::map<controller_digital_e_t, Digital>::iterator digital = this->digitals.find(button);
     return (digital == this->digitals.end()) ? 0 : digital->second.get_new_press();
+}
+
+template <typename... Params> std::int32_t umbc::VController::print(std::uint8_t line, std::uint8_t col, const char* fmt, Params... args) {
+    return 1;
 }
 
 std::int32_t umbc::VController::set_text(std::uint8_t line, std::uint8_t col, const char* str) {

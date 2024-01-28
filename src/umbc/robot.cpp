@@ -98,20 +98,14 @@ umbc::Robot::Robot() {
     this->mode = MODE_COMPETITION;
 }
 
-void umbc::Robot::set_controller_master(pros::Controller controller_master) {
-    this->controller_master = controller_master;
+void umbc::Robot::set_controllers_to_physical() {
+    this->controller_master = &(this->pcontroller_master);
+    this->controller_master = &(this->pcontroller_partner);
 }
 
-void umbc::Robot::set_controller_partner(pros::Controller controller_partner) {
-    this->controller_partner = controller_partner;
-}
-
-pros::Controller umbc::Robot::get_controller_master() {
-    return this->controller_master;
-}
-
-pros::Controller umbc::Robot::get_controller_partner() {
-    return this->controller_partner;
+void umbc::Robot::set_controllers_to_virtual() {
+    this->controller_master = &(this->vcontroller_master);
+    this->controller_master = &(this->vcontroller_partner);
 }
 
 umbc::competition umbc::Robot::get_competition() {
@@ -164,19 +158,13 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
 
     char* t_autonomous_name =  (char*)"autonomous";
 
-    pros::Controller controller_master_prev = this->get_controller_master();
-    pros::Controller controller_partner_prev = this->get_controller_partner();
-
-    VController vcontroller_master = VController();
-    VController vcontroller_partner = VController();
-
-    this->controller_master = vcontroller_master;
-    this->controller_partner = vcontroller_partner;
-    INFO("controller inputs set to virtual controllers");
+    INFO("setting robot controllers to virtual controllers...");
+	this->set_controllers_to_virtual();
+	INFO("robot controllers set to virtual controllers");
 
     if (COMPETITION_SKILLS == this->competition) {
         INFO("loading skills input file for virtual master controller...");
-        vcontroller_master.load(this->skills_autonomous_file_master);
+        this->vcontroller_master.load(this->skills_autonomous_file_master);
         INFO("loaded " << skills_autonomous_file_master << " as input file for virtual master controller");
         if (include_partner_controller) {
             INFO("loading skills input file for virtual partner controller...");
@@ -185,7 +173,7 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
         }
     } else {
         INFO("loading match input file for virtual master controller...");
-        vcontroller_master.load(this->match_autonomous_file_master);
+        this->vcontroller_master.load(this->match_autonomous_file_master);
         INFO("loaded " << match_autonomous_file_master << " as input file for virtual master controller");
         if (include_partner_controller) {
             INFO("loading match input file for virtual partner controller...");
@@ -199,7 +187,7 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
     INFO("opcontrol task started");
 
     INFO("starting task for virtual master controller...");
-    vcontroller_master.start();
+    this->vcontroller_master.start();
     INFO("virtual master controller task started");
 
     if (include_partner_controller) {
@@ -209,7 +197,7 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
     }
 
     INFO("waiting for virtual master controller input to complete...");
-    vcontroller_master.wait_till_complete();
+    this->vcontroller_master.wait_till_complete();
     INFO("virtual master controller input completed");
 
     if (include_partner_controller) {
@@ -222,9 +210,9 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
     opcontrol.remove();
     INFO("opcontrol task has been terminated");
 
-    this->controller_master = controller_master_prev;
-    this->controller_partner = controller_partner_prev;
-    INFO("controller inputs set to physical controllers...");
+    INFO("setting robot controllers to physical controllers...");
+    this->set_controllers_to_physical();
+	INFO("robot controllers set to physical controllers");
 
     INFO("autonomous completed");
 }
@@ -235,8 +223,8 @@ void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
 
     char* t_train_autonomous_name = (char*)"trainautonomous";
 
-    ControllerRecorder controller_recorder_master = ControllerRecorder(&controller_master, opcontrol_delay_ms);
-    ControllerRecorder controller_recorder_partner = ControllerRecorder(&controller_partner, opcontrol_delay_ms);
+    ControllerRecorder controller_recorder_master = ControllerRecorder(controller_master, opcontrol_delay_ms);
+    ControllerRecorder controller_recorder_partner = ControllerRecorder(controller_partner, opcontrol_delay_ms);
 
     INFO("starting opcontrol task...");
     Task opcontrol = Task((task_fn_t)this->robot_opcontrol, (void*)this, t_train_autonomous_name);

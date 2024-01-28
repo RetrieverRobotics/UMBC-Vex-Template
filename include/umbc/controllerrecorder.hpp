@@ -9,6 +9,7 @@
 #ifndef _UMBC_CONTROLLER_RECORDER_HPP_
 #define _UMBC_CONTROLLER_RECORDER_HPP_
 
+#include "controller.hpp"
 #include "controllerinput.hpp"
 #include "api.h"
 
@@ -25,7 +26,7 @@ class ControllerRecorder {
     static constexpr char* t_record_controller_input_name =  (char*)"controllerrecorder";
 
     std::uint16_t poll_rate_ms;
-    pros::Controller* controller;
+    umbc::Controller* controller;
     std::queue<ControllerInput> controller_input;
     std::unique_ptr<Task> t_record_controller_input;
 
@@ -57,7 +58,7 @@ class ControllerRecorder {
      *      The rate in milliseconds controller input will be polled at.
      *           
 	 */
-    ControllerRecorder(pros::Controller* controller, std::uint16_t poll_rate_ms);
+    ControllerRecorder(umbc::Controller* controller, std::uint16_t poll_rate_ms);
 
     /**
      * Saves the poll rate and recorded controller input into a binary file.

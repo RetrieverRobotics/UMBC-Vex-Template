@@ -9,6 +9,7 @@
 #ifndef _UMBC_V_CONTROLLER_HPP_
 #define _UMBC_V_CONTROLLER_HPP_
 
+#include "controller.hpp"
 #include "controllerinput.hpp"
 #include "api.h"
 
@@ -19,7 +20,7 @@ using namespace pros;
 using namespace std;
 
 namespace umbc {
-class VController : public Controller {
+class VController : public umbc::Controller {
 
 	private:
 	static constexpr char* t_update_controller_input_name = (char*)"vcontroller";
@@ -204,9 +205,7 @@ class VController : public Controller {
 	 * \return Always 1
 	 */
 	template <typename... Params>
-	std::int32_t print(std::uint8_t line, std::uint8_t col, const char* fmt, Params... args) {
-		return pros::c::controller_print(_id, line, col, fmt, convert_args(args)...);
-	}
+	std::int32_t print(std::uint8_t line, std::uint8_t col, const char* fmt, Params... args);
 
 	/**
 	 * Sets text to the controller LCD screen.

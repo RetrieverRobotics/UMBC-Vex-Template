@@ -111,8 +111,7 @@ void opcontrol() {
 		pros::lcd::clear();
 
 		INFO("setting robot controllers to physical controllers...");
-		robot.set_controller_master(pros::Controller(E_CONTROLLER_MASTER));
-		robot.set_controller_partner(pros::Controller(E_CONTROLLER_PARTNER));
+		robot.set_controllers_to_physical();
 		INFO("robot controllers set to physical controllers");
 
 		if (MODE_TRAIN_AUTONOMOUS == robot.get_mode()) {

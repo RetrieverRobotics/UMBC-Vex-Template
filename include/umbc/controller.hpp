@@ -9,7 +9,10 @@
 #ifndef _UMBC_CONTROLLER_HPP_
 #define _UMBC_CONTROLLER_HPP_
 
+#include "api.h"
+
 #include <cstdint>
+using namespace pros;
 using namespace std;
 
 namespace umbc {
@@ -20,7 +23,7 @@ class Controller {
 	 *
 	 * \return 1 if the controller is connected, 0 otherwise
 	 */
-	virtual std::int32_t is_connected(void);
+	virtual std::int32_t is_connected(void) = 0;
 
 	/**
 	 * Gets the value of an analog channel (joystick) on a controller.
@@ -33,21 +36,21 @@ class Controller {
 	 * \return The current reading of the analog channel: [-127, 127].
 	 * If the controller was not connected, then 0 is returned
 	 */
-	virtual std::int32_t get_analog(controller_analog_e_t channel);
+	virtual std::int32_t get_analog(pros::controller_analog_e_t channel) = 0;
 
 	/**
 	 * Gets the battery capacity of the controller.
 	 *
 	 * \return The controller's battery capacity
 	 */
-	virtual std::int32_t get_battery_capacity(void);
+	virtual std::int32_t get_battery_capacity(void) = 0;
 
 	/**
 	 * Gets the battery level of the controller.
 	 *
 	 * \return The controller's battery level
 	 */
-	virtual std::int32_t get_battery_level(void);
+	virtual std::int32_t get_battery_level(void) = 0;
 
 	/**
 	 * Checks if a digital channel (button) on the controller is currently
@@ -60,7 +63,7 @@ class Controller {
 	 * \return 1 if the button on the controller is pressed.
 	 * If the controller was not connected, then 0 is returned
 	 */
-	virtual std::int32_t get_digital(controller_digital_e_t button);
+	virtual std::int32_t get_digital(pros::controller_digital_e_t button) = 0;
 
 	/**
 	 * Returns a rising-edge case for a controller button press.
@@ -72,18 +75,7 @@ class Controller {
 	 * \return 1 if the button on the controller is pressed and had not been
 	 * pressed the last time this function was called, 0 otherwise.
 	 */
-	virtual std::int32_t get_digital_new_press(controller_digital_e_t button);
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
-	template <typename T>
-	T convert_args(T arg) {
-		return arg;
-	}
-	const char* convert_args(const std::string& arg) {
-		return arg.c_str();
-	}
-#pragma GCC diagnostic pop
+	virtual std::int32_t get_digital_new_press(pros::controller_digital_e_t button) = 0;
 
 	/**
 	 * Sets text to the controller LCD screen.
@@ -114,8 +106,8 @@ class Controller {
 	 *
 	 * \return 1 if the operation was successful. Otherwise PROS_ERR.
 	 */
-	virtual std::int32_t set_text(std::uint8_t line, std::uint8_t col, const char* str);
-	virtual std::int32_t set_text(std::uint8_t line, std::uint8_t col, const std::string& str);
+	virtual std::int32_t set_text(std::uint8_t line, std::uint8_t col, const char* str) = 0;
+	virtual std::int32_t set_text(std::uint8_t line, std::uint8_t col, const std::string& str) = 0;
 
 	/**
 	 * Clears an individual line of the controller screen.
@@ -125,7 +117,7 @@ class Controller {
 	 *
 	 * \return 1 if the operation was successful. Otherwise PROS_ERR.
 	 */
-	virtual std::int32_t clear_line(std::uint8_t line);
+	virtual std::int32_t clear_line(std::uint8_t line) = 0;
 
 	/**
 	 * Rumble the controller.
@@ -137,14 +129,14 @@ class Controller {
 	 *
 	 * \return 1 if the operation was successful. Otherwise PROS_ERR.
 	 */
-	virtual std::int32_t rumble(const char* rumble_pattern);
+	virtual std::int32_t rumble(const char* rumble_pattern) = 0;
 
 	/**
 	 * Clears all of the lines on the controller screen.
 	 *
 	 * \return 1 if the operation was successful. Otherwise PROS_ERR.
 	 */
-	virtual std::int32_t clear(void);
+	virtual std::int32_t clear(void) = 0;
 };
 }
 

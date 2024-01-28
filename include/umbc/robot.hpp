@@ -9,6 +9,9 @@
 #ifndef _UMBC_ROBOT_HPP_
 #define _UMBC_ROBOT_HPP_
 
+#include "controller.hpp"
+#include "pcontroller.hpp"
+#include "vcontroller.hpp"
 #include "api.h"
 
 #include <cstdint>
@@ -41,6 +44,7 @@ class Robot {
     static constexpr char* match_autonomous_file_partner = (char*)"/usd/autonomous_match-partner.bin";
     static constexpr char* skills_autonomous_file_master = (char*)"/usd/autonomous_skills.bin";
     static constexpr char* skills_autonomous_file_partner = (char*)"/usd/autonomous_skills-partner.bin";
+
     static constexpr uint32_t match_autonomous_time_ms = 45000;
     static constexpr uint32_t skills_autonomous_time_ms = 75000;
     static constexpr uint32_t opcontrol_delay_ms = 10;
@@ -48,8 +52,14 @@ class Robot {
     umbc::competition competition;
     umbc::mode mode;
 
-    pros::Controller controller_master = pros::Controller(E_CONTROLLER_MASTER);
-    pros::Controller controller_partner = pros::Controller(E_CONTROLLER_PARTNER);
+    umbc::PController pcontroller_master = umbc::PController(E_CONTROLLER_MASTER);
+    umbc::PController pcontroller_partner = umbc::PController(E_CONTROLLER_PARTNER);
+
+    umbc::VController vcontroller_master = umbc::VController();
+    umbc::VController vcontroller_partner = umbc::VController();
+
+    umbc::Controller* controller_master = &vcontroller_master;
+    umbc::Controller* controller_partner = &pcontroller_partner;
 
     /**
      * Menu to select the competition type using the LLEMU.
@@ -83,32 +93,14 @@ class Robot {
     Robot();
 
     /**
-     * Sets the master controller.
-     * 
-     * \param controller_master New master controller
+     * Sets the controllers to use physical controllers.
      */
-    void set_controller_master(pros::Controller controller_master);
+    void set_controllers_to_physical();
 
     /**
-     * Sets the partner controller.
-     * 
-     * \param controller_partner New partner controller
+     * Sets the controllers to use virtual controllers.
      */
-    void set_controller_partner(pros::Controller controller_partner);
-
-    /**
-     * Retrieve the master controller.
-     * 
-     * \return The master controller
-     */
-    pros::Controller get_controller_master();
-
-    /**
-     * Retrieve the partner controller.
-     * 
-     * \return the partner controller
-     */
-    pros::Controller get_controller_partner();
+    void set_controllers_to_virtual();
 
     /**
      * Retrieve the competition setting.
