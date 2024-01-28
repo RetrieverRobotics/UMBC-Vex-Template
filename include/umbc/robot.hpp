@@ -54,14 +54,14 @@ class Robot {
     /**
      * Menu to select the competition type using the LLEMU.
      * 
-     * @returns always 1
+     * \returns always 1
      */
     std::int32_t menu_competition();
 
     /**
      * Menu to select the mode using the LLEMU.
      * 
-     * @returns 1 if a selection was made, otherwise -1.
+     * \returns 1 if a selection was made, otherwise -1.
      */
     std::int32_t menu_mode();
 
@@ -69,7 +69,7 @@ class Robot {
      * Allows operator to manually control the robot via a controller. Used
      * for training autonomous.
      * 
-     * @param robot
+     * \param robot
      *          The type for this parameter must be Robot*.
      *          Intended to be 'this' pointer.
      */
@@ -85,42 +85,42 @@ class Robot {
     /**
      * Sets the master controller.
      * 
-     * @param controller_master New master controller
+     * \param controller_master New master controller
      */
     void set_controller_master(pros::Controller controller_master);
 
     /**
      * Sets the partner controller.
      * 
-     * @param controller_partner New partner controller
+     * \param controller_partner New partner controller
      */
     void set_controller_partner(pros::Controller controller_partner);
 
     /**
      * Retrieve the master controller.
      * 
-     * @return The master controller
+     * \return The master controller
      */
     pros::Controller get_controller_master();
 
     /**
      * Retrieve the partner controller.
      * 
-     * @return the partner controller
+     * \return the partner controller
      */
     pros::Controller get_controller_partner();
 
     /**
      * Retrieve the competition setting.
      * 
-     * @return the competition setting
+     * \return the competition setting
     */
     umbc::competition get_competition();
     
     /**
      * Retrieve the robot mode setting.
      * 
-     * @return the robot mode setting
+     * \return the robot mode setting
     */
     umbc::mode get_mode();
 
@@ -135,7 +135,7 @@ class Robot {
      * the robot using the controller recorder and playing back the
      * controller inputs using the virtual controller.
      * 
-     * @param include_partner_controller - Set to true if partner controller
+     * \param include_partner_controller - Set to true if partner controller
      *      input was previously recorded and should be used.
      */
     void autonomous(uint32_t include_partner_controller);
@@ -149,7 +149,7 @@ class Robot {
      * Trains an autonomous routine for either skills or a tournament
      * match through using opcontrol and the controller recorder.
      * 
-     * @param record_partner_controller - Set to true if the partner controller should be recorded.
+     * \param record_partner_controller - Set to true if the partner controller should be recorded.
      */
     void train_autonomous(uint32_t record_partner_controller);
 };

@@ -186,17 +186,6 @@ class VController : public Controller {
 	 */
 	std::int32_t get_digital_new_press(controller_digital_e_t button);
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
-	template <typename T>
-	T convert_args(T arg) {
-		return arg;
-	}
-	const char* convert_args(const std::string& arg) {
-		return arg.c_str();
-	}
-#pragma GCC diagnostic pop
-
 	/**
 	 * Sets text to the controller LCD screen.
 	 *
