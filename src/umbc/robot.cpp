@@ -118,7 +118,6 @@ umbc::competition umbc::Robot::get_competition() {
     return this->competition;
 }
     
-
 umbc::mode umbc::Robot::get_mode() {
     return this->mode;
 }
@@ -156,7 +155,7 @@ void umbc::Robot::menu() {
 }
 
 void umbc::Robot::robot_opcontrol(Robot* robot) {
-    robot->opcontrol(robot->get_controller_master(), robot->get_controller_partner());
+    robot->opcontrol();
 }
 
 void umbc::Robot::autonomous(uint32_t include_partner_controller) {

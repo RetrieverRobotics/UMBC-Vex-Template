@@ -43,6 +43,7 @@ void umbc::VController::update(void* vcontroller) {
     umbc::VController* controller = (umbc::VController*)vcontroller;
 
     if (0 == controller->poll_rate_ms) {
+        ERROR("invalid poll rate");
         return;
     }
 

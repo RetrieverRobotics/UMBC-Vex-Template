@@ -142,11 +142,8 @@ class Robot {
 
     /**
      * Allows operator to manually control the robot via a controller.
-     * 
-     * @param controller_master - Vex V5 master controller.
-     * @param controlelr_partner - Vex V5 partner controller.
      */
-    void opcontrol(pros::Controller controller_master, pros::Controller controller_partner);
+    void opcontrol();
 
     /**
      * Trains an autonomous routine for either skills or a tournament

@@ -136,7 +136,7 @@ void opcontrol() {
 		} else {
 			pros::lcd::set_text(1, "Opcontrol Active");
 			INFO("opcontrol active");
-			robot.opcontrol(robot.get_controller_master(), robot.get_controller_partner());
+			robot.opcontrol();
 		}
 	}
 }
