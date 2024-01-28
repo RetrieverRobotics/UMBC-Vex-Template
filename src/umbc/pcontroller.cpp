@@ -1,9 +1,8 @@
 /**
- * \file umbc/Pcontroller.cpp
+ * \file umbc/pcontroller.cpp
  *
  * Contains the implementaion of the PController. The PController
- * emulates user controller input through reading a formatted binary
- * file of controller inputs.
+ * is a wrapper class for pros::Controller.
  */
 
 #include "api.h"
