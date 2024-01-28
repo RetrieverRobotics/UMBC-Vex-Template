@@ -9,6 +9,9 @@
 #ifndef _UMBC_ROBOT_HPP_
 #define _UMBC_ROBOT_HPP_
 
+#include "controller.hpp"
+#include "pcontroller.hpp"
+#include "vcontroller.hpp"
 #include "api.h"
 
 #include <cstdint>
@@ -41,6 +44,7 @@ class Robot {
     static constexpr char* match_autonomous_file_partner = (char*)"/usd/autonomous_match-partner.bin";
     static constexpr char* skills_autonomous_file_master = (char*)"/usd/autonomous_skills.bin";
     static constexpr char* skills_autonomous_file_partner = (char*)"/usd/autonomous_skills-partner.bin";
+
     static constexpr uint32_t match_autonomous_time_ms = 45000;
     static constexpr uint32_t skills_autonomous_time_ms = 75000;
     static constexpr uint32_t opcontrol_delay_ms = 10;
@@ -48,20 +52,26 @@ class Robot {
     umbc::competition competition;
     umbc::mode mode;
 
-    pros::Controller controller_master = pros::Controller(E_CONTROLLER_MASTER);
-    pros::Controller controller_partner = pros::Controller(E_CONTROLLER_PARTNER);
+    umbc::PController pcontroller_master = umbc::PController(E_CONTROLLER_MASTER);
+    umbc::PController pcontroller_partner = umbc::PController(E_CONTROLLER_PARTNER);
+
+    umbc::VController vcontroller_master = umbc::VController();
+    umbc::VController vcontroller_partner = umbc::VController();
+
+    umbc::Controller* controller_master = &vcontroller_master;
+    umbc::Controller* controller_partner = &pcontroller_partner;
 
     /**
      * Menu to select the competition type using the LLEMU.
      * 
-     * @returns always 1
+     * \returns always 1
      */
     std::int32_t menu_competition();
 
     /**
      * Menu to select the mode using the LLEMU.
      * 
-     * @returns 1 if a selection was made, otherwise -1.
+     * \returns 1 if a selection was made, otherwise -1.
      */
     std::int32_t menu_mode();
 
@@ -69,7 +79,7 @@ class Robot {
      * Allows operator to manually control the robot via a controller. Used
      * for training autonomous.
      * 
-     * @param robot
+     * \param robot
      *          The type for this parameter must be Robot*.
      *          Intended to be 'this' pointer.
      */
@@ -83,44 +93,26 @@ class Robot {
     Robot();
 
     /**
-     * Sets the master controller.
-     * 
-     * @param controller_master New master controller
+     * Sets the controllers to use physical controllers.
      */
-    void set_controller_master(pros::Controller controller_master);
+    void set_controllers_to_physical();
 
     /**
-     * Sets the partner controller.
-     * 
-     * @param controller_partner New partner controller
+     * Sets the controllers to use virtual controllers.
      */
-    void set_controller_partner(pros::Controller controller_partner);
-
-    /**
-     * Retrieve the master controller.
-     * 
-     * @return The master controller
-     */
-    pros::Controller get_controller_master();
-
-    /**
-     * Retrieve the partner controller.
-     * 
-     * @return the partner controller
-     */
-    pros::Controller get_controller_partner();
+    void set_controllers_to_virtual();
 
     /**
      * Retrieve the competition setting.
      * 
-     * @return the competition setting
+     * \return the competition setting
     */
     umbc::competition get_competition();
     
     /**
      * Retrieve the robot mode setting.
      * 
-     * @return the robot mode setting
+     * \return the robot mode setting
     */
     umbc::mode get_mode();
 
@@ -135,24 +127,21 @@ class Robot {
      * the robot using the controller recorder and playing back the
      * controller inputs using the virtual controller.
      * 
-     * @param include_partner_controller - Set to true if partner controller
+     * \param include_partner_controller - Set to true if partner controller
      *      input was previously recorded and should be used.
      */
     void autonomous(uint32_t include_partner_controller);
 
     /**
      * Allows operator to manually control the robot via a controller.
-     * 
-     * @param controller_master - Vex V5 master controller.
-     * @param controlelr_partner - Vex V5 partner controller.
      */
-    void opcontrol(pros::Controller controller_master, pros::Controller controller_partner);
+    void opcontrol();
 
     /**
      * Trains an autonomous routine for either skills or a tournament
      * match through using opcontrol and the controller recorder.
      * 
-     * @param record_partner_controller - Set to true if the partner controller should be recorded.
+     * \param record_partner_controller - Set to true if the partner controller should be recorded.
      */
     void train_autonomous(uint32_t record_partner_controller);
 };
