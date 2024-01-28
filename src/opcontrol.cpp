@@ -15,14 +15,21 @@ using namespace pros;
 using namespace umbc;
 using namespace std;
 
-void umbc::Robot::opcontrol(pros::Controller controller_master, pros::Controller controller_partner) {
+void umbc::Robot::opcontrol() {
+
+    // nice names for controllers (do not edit)
+    umbc::Controller* controller_master = this->controller_master;
+    umbc::Controller* controller_partner = this->controller_partner;
 
     // initialize motors and sensors
+
 
     while(1) {
 
         // implement opcontrols
 
+
+        // required loop delay (do not edit)
         pros::Task::delay(this->opcontrol_delay_ms);
     }
 }
