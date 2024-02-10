@@ -71,7 +71,7 @@ void umbc::ControllerRecorder::record(void* ControllerRecorder) {
             controller_recorder->controller->get_analog(E_CONTROLLER_ANALOG_LEFT_X));
         controller_input.set_analog(E_CONTROLLER_ANALOG_LEFT_Y,
             controller_recorder->controller->get_analog(E_CONTROLLER_ANALOG_LEFT_Y));
-        controller_input.set_analog(E_CONTROLLER_ANALOG_LEFT_X,
+        controller_input.set_analog(E_CONTROLLER_ANALOG_RIGHT_X,
             controller_recorder->controller->get_analog(E_CONTROLLER_ANALOG_RIGHT_X));
         controller_input.set_analog(E_CONTROLLER_ANALOG_RIGHT_Y,
             controller_recorder->controller->get_analog(E_CONTROLLER_ANALOG_RIGHT_Y));
