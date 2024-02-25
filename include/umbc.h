@@ -1,7 +1,7 @@
 #ifndef _UMBC_H_
 #define _UMBC_H_
 
-#define MSG_DELAY_MS 3000
+#define MSG_DELAY_MS 1000
 
 #ifdef __cplusplus
 #include "umbc/controller.hpp"
