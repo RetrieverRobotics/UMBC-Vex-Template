@@ -30,7 +30,6 @@ void initialize() {
 	INFO("initializing robot...");
 
 	pros::lcd::initialize();
-	robot.menu();
 
 	INFO("robot initialized");
 }
@@ -64,7 +63,7 @@ void competition_initialize() {
 	INFO("performing competition initialization...");
 
 	pros::lcd::clear();
-	pros::lcd::set_text(1, "Connected to Field Controller");
+	robot.menu();
 
 	INFO("competition initialization completed");
 }
@@ -123,7 +122,7 @@ void opcontrol() {
     			pros::lcd::set_text(1, "Autonomous Training Complete");
     			INFO("autonomous training complete");
 				pros::Task::delay(MSG_DELAY_MS);
-				initialize();
+				competition_initialize();
 			} else {
 				ERROR("autonomous training failed; no SD Card detected");
 				pros::lcd::clear();
