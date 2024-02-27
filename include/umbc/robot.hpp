@@ -172,12 +172,11 @@ class Robot {
 	void opcontrol_stop(void);
 
     /**
-     * Checks if opcontrol task is currently recording.
+     * Checks if opcontrol task is on the ready, blocked, suspended or event lists.
      * 
-     * \return 1 if opcontrol task is running, otherwise 0
+     * \return 1 if opcontrol task is on the ready, blocked, suspended or event lists, otherwise 0
      */
-    std::int32_t opcontrol_isRunning();
-
+    std::int32_t opcontrol_isListed();
 };
 }
 

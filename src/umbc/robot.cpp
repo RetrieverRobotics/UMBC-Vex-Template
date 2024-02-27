@@ -320,7 +320,7 @@ void umbc::Robot::opcontrol_resume() {
 void umbc::Robot::opcontrol_stop() {
 
     Task* t_opcontrol = this->t_opcontrol.get();
-
+    
     if (nullptr != t_opcontrol) {
         try {
             t_opcontrol->remove();
@@ -331,9 +331,10 @@ void umbc::Robot::opcontrol_stop() {
     }
 }
 
-std::int32_t umbc::Robot::opcontrol_isRunning() {
+std::int32_t umbc::Robot::opcontrol_isListed() {
 
     Task* t_opcontrol = this->t_opcontrol.get();
 
-    return (nullptr == t_opcontrol) ? 0 : t_opcontrol->get_state() == E_TASK_STATE_RUNNING;
+    return (nullptr == t_opcontrol) ? 0 
+        : ((t_opcontrol->get_state() != E_TASK_STATE_INVALID) && (t_opcontrol->get_state() != E_TASK_STATE_DELETED));
 }
