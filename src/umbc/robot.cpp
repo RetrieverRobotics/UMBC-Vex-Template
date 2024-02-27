@@ -156,8 +156,6 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
 
     INFO("autonomous active");
 
-    char* t_autonomous_name =  (char*)"autonomous";
-
     INFO("setting robot controllers to virtual controllers...");
 	this->set_controllers_to_virtual();
 	INFO("robot controllers set to virtual controllers");
@@ -183,7 +181,7 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
     }
 
     INFO("starting opcontrol task...");
-    Task opcontrol = Task((task_fn_t)this->robot_opcontrol, (void*)this, t_autonomous_name);
+    this->opcontrol_start();
     INFO("opcontrol task started");
 
     INFO("starting task for virtual master controller...");
@@ -207,7 +205,7 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
     }
 
     INFO("terminating opcontrol task...");
-    opcontrol.remove();
+    this->opcontrol_stop();
     INFO("opcontrol task has been terminated");
 
     INFO("setting robot controllers to physical controllers...");
@@ -221,13 +219,11 @@ void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
 
     INFO("autonomous training active");
 
-    char* t_train_autonomous_name = (char*)"trainautonomous";
-
     ControllerRecorder controller_recorder_master = ControllerRecorder(controller_master, opcontrol_delay_ms);
     ControllerRecorder controller_recorder_partner = ControllerRecorder(controller_partner, opcontrol_delay_ms);
 
     INFO("starting opcontrol task...");
-    Task opcontrol = Task((task_fn_t)this->robot_opcontrol, (void*)this, t_train_autonomous_name);
+    this->opcontrol_start();
     INFO("opcontrol task started");
 
     INFO("starting master controller recording...");
@@ -250,7 +246,7 @@ void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
     }
 
     INFO("terminating opcontrol task...");
-    opcontrol.remove();
+    this->opcontrol_stop();
     INFO("opcontrol task has been terminated");
 
     INFO("stopping master controller recording...");
@@ -283,4 +279,61 @@ void umbc::Robot::train_autonomous(uint32_t record_partner_controller) {
     }
 
     INFO("autonomous training complete");
+}
+
+void umbc::Robot::opcontrol_start() {
+
+    this->t_opcontrol.reset(
+        new Task((task_fn_t)this->robot_opcontrol, (void*)this, this->t_opcontrol_name));
+    INFO(string(t_opcontrol_name) + " has started");
+}
+
+void umbc::Robot::opcontrol_pause() {
+
+    Task* t_opcontrol = this->t_opcontrol.get();
+
+    if (nullptr != t_opcontrol) {
+        try {
+            t_opcontrol->suspend();
+            INFO(string(t_opcontrol_name) + " is paused");
+        }
+        catch (...) {
+            ERROR("failed to suspend " + string(t_opcontrol_name));
+        }
+    }
+}
+
+void umbc::Robot::opcontrol_resume() {
+
+    Task* t_opcontrol = this->t_opcontrol.get();
+
+    if (nullptr != t_opcontrol) {
+        try {
+            t_opcontrol->resume();
+            INFO(string(t_opcontrol_name) + " has resumed");
+        } catch (...) {
+            ERROR("failed to resume " +  string(t_opcontrol_name));
+        }
+    }
+}
+
+void umbc::Robot::opcontrol_stop() {
+
+    Task* t_opcontrol = this->t_opcontrol.get();
+
+    if (nullptr != t_opcontrol) {
+        try {
+            t_opcontrol->remove();
+            INFO(string(t_opcontrol_name) + " is stopped");
+        } catch (...) {
+            ERROR("failed to stop " + string(t_opcontrol_name));
+        }
+    }
+}
+
+std::int32_t umbc::Robot::opcontrol_isRunning() {
+
+    Task* t_opcontrol = this->t_opcontrol.get();
+
+    return (nullptr == t_opcontrol) ? 0 : t_opcontrol->get_state() == E_TASK_STATE_RUNNING;
 }

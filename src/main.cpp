@@ -46,6 +46,10 @@ void disabled() {
 	pros::lcd::clear();
 	pros::lcd::set_text(1, "Robot Disabled");
 
+	if (robot.opcontrol_isRunning()) {
+		robot.opcontrol_stop();
+	}
+
 	INFO("robot disabled");
 }
 
@@ -105,6 +109,10 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+
+	if (robot.opcontrol_isRunning()) {
+		robot.opcontrol_stop();
+	}
 
 	while (1) {
 		pros::lcd::clear();

@@ -40,6 +40,8 @@ typedef enum {
 class Robot {
     
     private:
+    static constexpr char* t_opcontrol_name =  (char*)"robot_opcontrol";
+
     static constexpr char* match_autonomous_file_master = (char*)"/usd/autonomous_match.bin";
     static constexpr char* match_autonomous_file_partner = (char*)"/usd/autonomous_match-partner.bin";
     static constexpr char* skills_autonomous_file_master = (char*)"/usd/autonomous_skills.bin";
@@ -60,6 +62,8 @@ class Robot {
 
     umbc::Controller* controller_master = &vcontroller_master;
     umbc::Controller* controller_partner = &pcontroller_partner;
+
+    std::unique_ptr<Task> t_opcontrol;
 
     /**
      * Menu to select the competition type using the LLEMU.
@@ -144,6 +148,36 @@ class Robot {
      * \param record_partner_controller - Set to true if the partner controller should be recorded.
      */
     void train_autonomous(uint32_t record_partner_controller);
+
+    /**
+     * Starts opcontrol task.
+     */
+	void opcontrol_start(void);
+
+    /**
+     * Pauses opcontrol task if opcontrol task is currently
+     * active.
+     */
+	void opcontrol_pause(void);
+
+    /**
+     * Resumes opcontrol task if opcontrol task is currently
+     * paused.
+     */
+	void opcontrol_resume(void);
+
+    /**
+     * Stops opcontrol task.
+     */
+	void opcontrol_stop(void);
+
+    /**
+     * Checks if opcontrol task is currently recording.
+     * 
+     * \return 1 if opcontrol task is running, otherwise 0
+     */
+    std::int32_t opcontrol_isRunning();
+
 };
 }
 
