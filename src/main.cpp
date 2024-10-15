@@ -5,7 +5,7 @@
  * Competition.
  */
 
- #include <iostream>
+#include <iostream>
 
 #include "main.h"
 #include "api.h"
@@ -67,7 +67,8 @@ void competition_initialize() {
 	INFO("performing competition initialization...");
 
 	pros::lcd::clear();
-	robot.menu();
+	Menu menu = Menu(&robot);
+	menu.robot_menu();
 
 	INFO("competition initialization completed");
 }
