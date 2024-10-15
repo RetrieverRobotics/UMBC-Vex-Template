@@ -31,12 +31,6 @@ typedef enum {
     MODE_TRAIN_AUTONOMOUS = 1
 } mode;
 
-typedef enum {
-    MENU_COMPETITION = 0,
-    MENU_MODE = 1,
-    MENU_MAX
-} sub_menu;
-
 class Robot {
     
     private:
@@ -112,13 +106,23 @@ class Robot {
      * \return the competition setting
     */
     umbc::competition get_competition();
-    
+
+    /**
+     * Set the competition setting.
+    */
+    void set_competition(umbc::competition competition);
+
     /**
      * Retrieve the robot mode setting.
      * 
      * \return the robot mode setting
     */
     umbc::mode get_mode();
+
+    /**
+     * Set the robot mode setting.
+    */
+    void set_mode(umbc::mode mode);
 
     /**
      * Menu for selecting mode, competition, alliance, and starting
