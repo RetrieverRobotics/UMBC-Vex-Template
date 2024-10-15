@@ -98,7 +98,7 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
         INFO("loaded " << skills_autonomous_file_master << " as input file for virtual master controller");
         if (include_partner_controller) {
             INFO("loading skills input file for virtual partner controller...");
-            vcontroller_partner.load(this->skills_autonomous_file_partner);
+            this->vcontroller_partner.load(this->skills_autonomous_file_partner);
             INFO("loaded " << skills_autonomous_file_partner << " as input file for virtual partner controller");
         }
     } else {
@@ -107,7 +107,7 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
         INFO("loaded " << match_autonomous_file_master << " as input file for virtual master controller");
         if (include_partner_controller) {
             INFO("loading match input file for virtual partner controller...");
-            vcontroller_partner.load(this->match_autonomous_file_partner);
+            this->vcontroller_partner.load(this->match_autonomous_file_partner);
             INFO("loaded " << match_autonomous_file_partner << " as input file for virtual partner controller");
         }
     }
@@ -122,7 +122,7 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
 
     if (include_partner_controller) {
         INFO("starting task for virtual partner controller...");
-        vcontroller_partner.start();
+        this->vcontroller_partner.start();
         INFO("virtual partner controller task started");
     }
 
@@ -132,7 +132,7 @@ void umbc::Robot::autonomous(uint32_t include_partner_controller) {
 
     if (include_partner_controller) {
         INFO("waiting for virtual partner controller input to complete...");
-        vcontroller_partner.wait_till_complete();
+        this->vcontroller_partner.wait_till_complete();
         INFO("virtual partner controller input completed");
     }
 
