@@ -41,7 +41,7 @@ class Robot {
     static constexpr char* skills_autonomous_file_master = (char*)"/usd/autonomous_skills.bin";
     static constexpr char* skills_autonomous_file_partner = (char*)"/usd/autonomous_skills-partner.bin";
 
-    static constexpr uint32_t match_autonomous_time_ms = 45000;
+    static constexpr uint32_t match_autonomous_time_ms = 30000;
     static constexpr uint32_t skills_autonomous_time_ms = 60000;
     static constexpr uint32_t opcontrol_delay_ms = 10;
 
