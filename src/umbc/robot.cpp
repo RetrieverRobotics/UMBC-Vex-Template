@@ -48,38 +48,6 @@ void umbc::Robot::set_mode(umbc::mode mode) {
     this->mode = mode;
 }
 
-void umbc::Robot::menu() {
-
-    uint8_t current_sub_menu = MENU_COMPETITION;
-
-    if (!pros::lcd::is_initialized()) {
-        ERROR("failed to initialize LCD menu");
-        return;
-    }
-
-    pros::lcd::clear();
-
-    while (MENU_MAX > current_sub_menu) {
-
-        switch (current_sub_menu) {
-            case MENU_COMPETITION:
-                current_sub_menu += menu_competition();
-            break;
-            case MENU_MODE:
-                current_sub_menu += menu_mode();
-            break;
-            default:
-                break;
-        }
-    }
-
-    pros::lcd::clear();
-    pros::lcd::set_text(1, "Selection Complete");
-    pros::Task::delay(MSG_DELAY_MS);
-    pros::lcd::clear();
-    INFO("menu selections completed");
-}
-
 void umbc::Robot::robot_opcontrol(Robot* robot) {
     robot->opcontrol();
 }
@@ -263,7 +231,7 @@ void umbc::Robot::opcontrol_stop() {
     }
 }
 
-std::int32_t umbc::Robot::opcontrol_isListed() {
+std::int32_t umbc::Robot::opcontrol_is_listed() {
 
     Task* t_opcontrol = this->t_opcontrol.get();
 

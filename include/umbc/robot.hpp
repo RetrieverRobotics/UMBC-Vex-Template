@@ -60,20 +60,6 @@ class Robot {
     std::unique_ptr<Task> t_opcontrol;
 
     /**
-     * Menu to select the competition type using the LLEMU.
-     * 
-     * \returns always 1
-     */
-    std::int32_t menu_competition();
-
-    /**
-     * Menu to select the mode using the LLEMU.
-     * 
-     * \returns 1 if a selection was made, otherwise -1.
-     */
-    std::int32_t menu_mode();
-
-    /**
      * Allows operator to manually control the robot via a controller. Used
      * for training autonomous.
      * 
@@ -125,12 +111,6 @@ class Robot {
     void set_mode(umbc::mode mode);
 
     /**
-     * Menu for selecting mode, competition, alliance, and starting
-     * position useing the LLEMU.
-     */
-    void menu();
-
-    /**
      * Robot performs a preset routine that was created by training
      * the robot using the controller recorder and playing back the
      * controller inputs using the virtual controller.
@@ -180,7 +160,7 @@ class Robot {
      * 
      * \return 1 if opcontrol task is on the ready, blocked, suspended or event lists, otherwise 0
      */
-    std::int32_t opcontrol_isListed();
+    std::int32_t opcontrol_is_listed();
 };
 }
 
