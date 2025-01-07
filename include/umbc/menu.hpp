@@ -1,9 +1,9 @@
 /**
  * \file umbc/menu.hpp
  *
- * Contains the prototype for the Robot. The Robot holds various values used for
- * different modes, as well as holds the functions for the selection menu,
- * autonomous, training autonomous, and opcontrol.
+ * Contains the prototype for the menu system. The Menu class contains
+ * various sub-menus for putting the robot in different modes and 
+ * configuring settings.
  */
 
 #ifndef _UMBC_MENU_HPP_
