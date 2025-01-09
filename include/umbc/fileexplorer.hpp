@@ -8,16 +8,20 @@
 #ifndef _FILE_EXPLORER_HPP_
 #define _FILE_EXPLORER_HPP_
 
-#include "api.h"
-#include "robot.hpp"
-
+// standard libraries
 #include <cstdint>
 #include <string>
 #include <map>
 #include <list>
 
+// local header files
+#include "api.h"
+#include "robot.hpp"
+
+// namespaces used
 using namespace pros;
 using namespace std;
+
 
 namespace umbc {
 
