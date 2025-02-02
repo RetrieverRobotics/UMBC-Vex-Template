@@ -51,7 +51,7 @@ namespace umbc {
 			 * 
 			 * @note Sets errno to EACCES when an error state is reached
 			 */
-			std::int32_t is_connected(void);
+			std::int32_t is_connected();
 
 			/**
 			 * @brief Gets the value of an analog channel (joystick) on a controller
@@ -73,7 +73,7 @@ namespace umbc {
 			 * 
 			 * @note Sets errno to EACCES when an error state is reached
 			 */
-			std::int32_t get_battery_capacity(void);
+			std::int32_t get_battery_capacity();
 
 			/**
 			 * @brief Gets the battery level of the controller
@@ -82,7 +82,7 @@ namespace umbc {
 			 * 
 			 * @note Sets errno to EACCES when an error state is reached
 			 */
-			std::int32_t get_battery_level(void);
+			std::int32_t get_battery_level();
 
 			/**
 			 * @brief Checks if a digital channel (button) on the controller is pressed
@@ -101,7 +101,7 @@ namespace umbc {
 			 * @brief Returns a rising-edge case for a controller button press
 			 *
 			 * @param button: Button to read. Must be
-			 *        DIGITAL_{RIGHT,DOWN,LEFT,UP,A,B,Y,X,R1,R2,L1,L2}
+			 * 		DIGITAL_{RIGHT,DOWN,LEFT,UP,A,B,Y,X,R1,R2,L1,L2}
 			 *
 			 * @return 1 if the button on the controller is pressed and had not been
 			 * 		pressed the last time this function was called, 0 otherwise
@@ -198,7 +198,7 @@ namespace umbc {
 			 * 		updates will not work well. On vexOS version 1.0.0 this function will
 			 * 		block for 110ms
 			 */
-			std::int32_t clear(void);
+			std::int32_t clear();
 	};
 }
 

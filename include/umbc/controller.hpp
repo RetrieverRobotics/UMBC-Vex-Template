@@ -35,7 +35,7 @@ namespace umbc {
 			 *
 			 * @return 1 if the controller is connected. Otherwise 0
 			 */
-			virtual std::int32_t is_connected(void) = 0;
+			virtual std::int32_t is_connected() = 0;
 
 			/**
 			 * @brief Gets the value of an analog channel (joystick) on a controller
@@ -53,14 +53,14 @@ namespace umbc {
 			 *
 			 * @return Controller's battery capacity
 			 */
-			virtual std::int32_t get_battery_capacity(void) = 0;
+			virtual std::int32_t get_battery_capacity() = 0;
 
 			/**
 			 * @brief Gets the battery level of the controller
 			 *
 			 * @return Controller's battery level
 			 */
-			virtual std::int32_t get_battery_level(void) = 0;
+			virtual std::int32_t get_battery_level() = 0;
 
 			/**
 			 * @brief Checks if a digital channel (button) on the controller is pressed
@@ -133,7 +133,7 @@ namespace umbc {
 			 *
 			 * @return 1 if the operation was successful. Otherwise PROS_ERR
 			 */
-			virtual std::int32_t clear(void) = 0;
+			virtual std::int32_t clear() = 0;
 	};
 }
 
