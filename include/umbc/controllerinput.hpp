@@ -24,7 +24,7 @@ namespace umbc {
 	/**
 	 * Lower and upper value limits for controller analog channels
 	 */
-	enum class ControllerAnalogLimit : int32_t {
+	enum class ControllerAnalogLimit : std::int32_t {
 		MIN = -127,
 		MAX = 127
 	};
@@ -74,7 +74,7 @@ namespace umbc {
 			 *
 			 * @return Value of the analog input: [-127, 127]
 			 */
-			std::int32_t get_analog(controller_analog_e_t channel);
+			std::int32_t get_analog(pros::controller_analog_e_t channel);
 
 			/**
 			 * @brief Gets the value of a digital input (button)
@@ -84,7 +84,7 @@ namespace umbc {
 			 *
 			 * @return Value of the digital input: 1 or 0
 			 */
-			std::int32_t get_digital(controller_digital_e_t button);
+			std::int32_t get_digital(pros::controller_digital_e_t button);
 
 			/**
 			 * @brief Sets the value of an analog input (thumbstick)
@@ -97,7 +97,7 @@ namespace umbc {
 			 * @note Values lower than -127 will be converted to -127, and values higher
 			 * 		than 127 will be converted to 127 for the value parameter.
 			 */
-			void set_analog(controller_analog_e_t channel, std::int32_t value);
+			void set_analog(pros::controller_analog_e_t channel, std::int32_t value);
 
 			/**
 			 * @brief Sets the value of a digital input (button)
@@ -109,7 +109,7 @@ namespace umbc {
 			 * 
 			 * @note Non-zero numbers will be converted to 1 for the value parameter.
 			 */
-			void set_digital(controller_digital_e_t button, std::int32_t value);
+			void set_digital(pros::controller_digital_e_t button, std::int32_t value);
 	};
 }
 

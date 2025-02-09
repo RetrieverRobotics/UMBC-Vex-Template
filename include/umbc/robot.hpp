@@ -41,9 +41,9 @@ class Robot {
     static constexpr char* skills_autonomous_file_master = (char*)"/usd/autonomous_skills.bin";
     static constexpr char* skills_autonomous_file_partner = (char*)"/usd/autonomous_skills-partner.bin";
 
-    static constexpr uint32_t match_autonomous_time_ms = 30000;
-    static constexpr uint32_t skills_autonomous_time_ms = 60000;
-    static constexpr uint32_t opcontrol_delay_ms = 10;
+    static constexpr std::uint32_t match_autonomous_time_ms = 30000;
+    static constexpr std::uint32_t skills_autonomous_time_ms = 60000;
+    static constexpr std::uint32_t opcontrol_delay_ms = 10;
 
     umbc::competition competition;
     umbc::mode mode;
@@ -118,7 +118,7 @@ class Robot {
      * \param include_partner_controller - Set to true if partner controller
      *      input was previously recorded and should be used.
      */
-    void autonomous(uint32_t include_partner_controller);
+    void autonomous(std::uint32_t include_partner_controller);
 
     /**
      * Allows operator to manually control the robot via a controller.
@@ -131,29 +131,29 @@ class Robot {
      * 
      * \param record_partner_controller - Set to true if the partner controller should be recorded.
      */
-    void train_autonomous(uint32_t record_partner_controller);
+    void train_autonomous(std::uint32_t record_partner_controller);
 
     /**
      * Starts opcontrol task.
      */
-	void opcontrol_start(void);
+	void opcontrol_start();
 
     /**
      * Pauses opcontrol task if opcontrol task is currently
      * active.
      */
-	void opcontrol_pause(void);
+	void opcontrol_pause();
 
     /**
      * Resumes opcontrol task if opcontrol task is currently
      * paused.
      */
-	void opcontrol_resume(void);
+	void opcontrol_resume();
 
     /**
      * Stops opcontrol task.
      */
-	void opcontrol_stop(void);
+	void opcontrol_stop();
 
     /**
      * Checks if opcontrol task is on the ready, blocked, suspended or event lists.

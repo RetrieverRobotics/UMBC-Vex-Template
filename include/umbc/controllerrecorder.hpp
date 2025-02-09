@@ -78,29 +78,29 @@ class ControllerRecorder {
     /**
      * Starts recording controller input.
      */
-	void start(void);
+	void start();
 
     /**
      * Pauses recording controller input if controller recording is currently
      * active.
      */
-	void pause(void);
+	void pause();
 
     /**
      * Resumes recording controller input if controller recording is currently
      * paused.
      */
-	void resume(void);
+	void resume();
 
     /**
      * Stops recording controller input.
      */
-	void stop(void);
+	void stop();
 
     /**
      * Clears the controller input buffer.
      */
-    void reset(void);
+    void reset();
 
     /**
      * Checks if currently recording.

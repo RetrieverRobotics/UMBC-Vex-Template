@@ -31,7 +31,7 @@ namespace umbc {
 
 		private:
 
-			pros::Controller controller; // used to interact with the physical controller
+			pros::v5::Controller controller; // used to interact with the physical controller
 
 
 		public:
@@ -42,7 +42,7 @@ namespace umbc {
 			 * @param id: The ID of the controller (e.g. the master or partner controller).
 			 * 		Must be one of CONTROLLER_MASTER or CONTROLLER_PARTNER
 			 */
-			PController(controller_id_e_t id);
+			PController(pros::controller_id_e_t id);
 
 			/**
 			 * @brief Checks if the controller is connected
@@ -64,7 +64,7 @@ namespace umbc {
 			 * @note If the controller is not connected, then 0 is returned
 			 * @note Sets errno to EACCES when an error state is reached
 			 */
-			std::int32_t get_analog(controller_analog_e_t channel);
+			std::int32_t get_analog(pros::controller_analog_e_t channel);
 
 			/**
 			 * @brief Gets the battery capacity of the controller
@@ -95,7 +95,7 @@ namespace umbc {
 			 * @note Sets errno to EACCES when an error state is reached
 			 * @note 0 is returned if the controller is not connected
 			 */
-			std::int32_t get_digital(controller_digital_e_t button);
+			std::int32_t get_digital(pros::controller_digital_e_t button);
 
 			/**
 			 * @brief Returns a rising-edge case for a controller button press
@@ -109,7 +109,7 @@ namespace umbc {
 			 * @note Sets errno to EACCES when an error state is reached
 			 * @note Not thread safe
 			 */
-			std::int32_t get_digital_new_press(controller_digital_e_t button);
+			std::int32_t get_digital_new_press(pros::controller_digital_e_t button);
 
 			#pragma GCC diagnostic push
 			#pragma GCC diagnostic ignored "-Wunused-function"

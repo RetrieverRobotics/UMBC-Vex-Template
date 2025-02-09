@@ -175,7 +175,7 @@ namespace umbc {
 			 *
 			 * @return 1 if the button on the controller is pressed. Otherwise 0
 			 */
-			std::int32_t get_digital(controller_digital_e_t button);
+			std::int32_t get_digital(pros::controller_digital_e_t button);
 
 			/**
 			 * @brief Returns a rising-edge case for a controller button press
@@ -188,7 +188,7 @@ namespace umbc {
 			 * 
 			 * @note Not thread safe
 			 */
-			std::int32_t get_digital_new_press(controller_digital_e_t button);
+			std::int32_t get_digital_new_press(pros::controller_digital_e_t button);
 
 			/**
 			 * @brief Sets text to the controller LCD screen
