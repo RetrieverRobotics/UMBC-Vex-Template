@@ -84,10 +84,13 @@ std::int32_t umbc::ControllerInput::get_digital(controller_digital_e_t button) {
 
 void umbc::ControllerInput::set_analog(controller_analog_e_t channel, std::int32_t value) {
 
-    if (value < E_CONTROLLER_ANALOG_MIN) {
-        value = E_CONTROLLER_ANALOG_MIN;
-    } else if (value > E_CONTROLLER_ANALOG_MAX) {
-        value = E_CONTROLLER_ANALOG_MAX;
+    const int32_t analog_min = static_cast<int32_t>(ControllerAnalogLimit::MIN);
+    const int32_t analog_max = static_cast<int32_t>(ControllerAnalogLimit::MAX);
+
+    if (value < analog_min) {
+        value = analog_min;
+    } else if (value > analog_max) {
+        value = analog_max;
     }
 
     switch(channel) {

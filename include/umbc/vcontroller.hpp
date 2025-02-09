@@ -176,7 +176,6 @@ namespace umbc {
 			 * @return 1 if the button on the controller is pressed. Otherwise 0
 			 */
 			std::int32_t get_digital(controller_digital_e_t button);
-			std::int32_t get_digital(controller_digital_e_t button);
 
 			/**
 			 * @brief Returns a rising-edge case for a controller button press
