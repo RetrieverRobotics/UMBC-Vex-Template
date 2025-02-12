@@ -1,7 +1,7 @@
 /**
  * @file umbc/menu.hpp
  *
- * Contains the prototype for the menu system. The Menu class contains
+ * Contains the prototype for the Menu class. The Menu class contains
  * various sub-menus for putting the robot into different modes.
  */
 
@@ -33,10 +33,13 @@ namespace umbc {
              * Sub-menu identifiers
              */
             enum class SubMenu : std::int32_t {
+                NONE = -1,  // no sub-menu
                 MATCH = 0,  // sub-menu for selecting match type
                 MODE = 1,   // sub-menu for selecting robot mode
-                MAX         // delete when refactoring
             };
+
+            // delay for when continuously polling LCD buttons in milliseconds
+            static constexpr std::uint32_t lcd_btn_polling_delay_ms = 10;
         
             umbc::Robot* robot = nullptr;   // reference to robot being configured by the menu
 
