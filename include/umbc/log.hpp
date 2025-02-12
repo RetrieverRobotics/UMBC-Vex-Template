@@ -15,12 +15,22 @@
 
 // logging enabled
 #ifdef LOG
+
+    // prints a debug level message to the serial out stream
+    #define DEBUG(str) cout << "DEBUG: " << str << endl;
+
+    // prints an information level message to the serial out stream
     #define INFO(str) cout << "INFO: " << str << endl;
+
+    // prints a warning level message to the serial out stream
     #define WARN(str) cout << "WARN: " << str << endl;
+    
+    // prints an error level message to the serial out stream
     #define ERROR(str) cerr << "ERROR: " << str << endl;
 
 // logging disabled
 #else
+    #define DEBUG(str)
     #define INFO(str)
     #define WARN(str)
     #define ERROR(str)
