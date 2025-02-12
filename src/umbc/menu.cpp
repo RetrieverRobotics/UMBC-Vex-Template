@@ -31,10 +31,10 @@ std::int32_t umbc::Menu::menu_competition() {
         btn_press = pros::lcd::read_buttons();
         
         if (LCD_BTN_LEFT == btn_press) {
-            this->robot->set_competition(COMPETITION_MATCH);
+            this->robot->set_match_type(umbc::MatchType::TOURNAMENT);
             INFO("match selected for competition mode");
         } else if (LCD_BTN_CENTER == btn_press) {
-            this->robot->set_competition(COMPETITION_SKILLS);
+            this->robot->set_match_type(umbc::MatchType::SKILLS);
             INFO("skills selected for competition mode");
         } else {
             btn_press = 0;
@@ -69,10 +69,10 @@ std::int32_t umbc::Menu::menu_mode() {
         btn_press = pros::lcd::read_buttons();
         
         if (LCD_BTN_LEFT == btn_press) {
-            this->robot->set_mode(MODE_COMPETITION);
+            this->robot->set_mode(umbc::RobotMode::COMPETITION);
             INFO("competition selected for mode");
         } else if (LCD_BTN_CENTER == btn_press) {
-            this->robot->set_mode(MODE_TRAIN_AUTONOMOUS);
+            this->robot->set_mode(umbc::RobotMode::TRAIN_AUTONOMOUS);
             INFO("train autonomous selected for mode");
         } else if (LCD_BTN_RIGHT == btn_press) {
             menu_direction = -1;

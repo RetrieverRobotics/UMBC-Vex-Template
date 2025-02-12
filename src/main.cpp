@@ -46,7 +46,7 @@ void disabled() {
 	pros::lcd::clear();
 	pros::lcd::set_text(1, "Robot Disabled");
 
-	if (robot.opcontrol_is_listed()) {
+	if (robot.is_opcontrol_listed()) {
 		robot.opcontrol_stop();
 	}
 
@@ -111,7 +111,7 @@ void autonomous() {
  */
 void opcontrol() {
 
-	if (robot.opcontrol_is_listed()) {
+	if (robot.is_opcontrol_listed()) {
 		robot.opcontrol_stop();
 	}
 
@@ -122,7 +122,7 @@ void opcontrol() {
 		robot.set_controllers_to_physical();
 		INFO("robot controllers set to physical controllers");
 
-		if (MODE_TRAIN_AUTONOMOUS == robot.get_mode()) {
+		if (umbc::RobotMode::TRAIN_AUTONOMOUS == robot.get_mode()) {
 			INFO("autonomous training starting...");
 			if (pros::usd::is_installed()) {
 				pros::lcd::set_text(1, "Autonomous Training Active");
