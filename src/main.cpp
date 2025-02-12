@@ -122,7 +122,7 @@ void opcontrol() {
 		robot.set_controllers_to_physical();
 		INFO("robot controllers set to physical controllers");
 
-		if (umbc::RobotMode::TRAIN_AUTONOMOUS == robot.get_mode()) {
+		if (umbc::Robot::Mode::TRAIN_AUTONOMOUS == robot.get_mode()) {
 			INFO("autonomous training starting...");
 			if (pros::usd::is_installed()) {
 				pros::lcd::set_text(1, "Autonomous Training Active");

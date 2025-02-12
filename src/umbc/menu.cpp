@@ -16,7 +16,7 @@ using namespace pros;
 using namespace umbc;
 using namespace std;
 
-std::int32_t umbc::Menu::menu_competition() {
+umbc::Robot::MatchType umbc::Menu::menu_match() {
 
     std::uint8_t btn_press = 0;
 
@@ -31,10 +31,10 @@ std::int32_t umbc::Menu::menu_competition() {
         btn_press = pros::lcd::read_buttons();
         
         if (LCD_BTN_LEFT == btn_press) {
-            this->robot->set_match_type(umbc::MatchType::TOURNAMENT);
+            this->robot->set_match_type(umbc::Robot::MatchType::TOURNAMENT);
             INFO("match selected for competition mode");
         } else if (LCD_BTN_CENTER == btn_press) {
-            this->robot->set_match_type(umbc::MatchType::SKILLS);
+            this->robot->set_match_type(umbc::Robot::MatchType::SKILLS);
             INFO("skills selected for competition mode");
         } else {
             btn_press = 0;
@@ -49,10 +49,10 @@ std::int32_t umbc::Menu::menu_competition() {
 
     pros::lcd::clear();
 
-    return 1;
+    return umbc::Robot::MatchType::NONE;   // change to actually returned
 }
 
-std::int32_t umbc::Menu::menu_mode() {
+umbc::Robot::Mode umbc::Menu::menu_mode() {
 
     std::int32_t menu_direction = 1;
     std::uint8_t btn_press = 0;
@@ -69,10 +69,10 @@ std::int32_t umbc::Menu::menu_mode() {
         btn_press = pros::lcd::read_buttons();
         
         if (LCD_BTN_LEFT == btn_press) {
-            this->robot->set_mode(umbc::RobotMode::COMPETITION);
+            this->robot->set_mode(umbc::Robot::Mode::COMPETITION);
             INFO("competition selected for mode");
         } else if (LCD_BTN_CENTER == btn_press) {
-            this->robot->set_mode(umbc::RobotMode::TRAIN_AUTONOMOUS);
+            this->robot->set_mode(umbc::Robot::Mode::TRAIN_AUTONOMOUS);
             INFO("train autonomous selected for mode");
         } else if (LCD_BTN_RIGHT == btn_press) {
             menu_direction = -1;
@@ -89,7 +89,7 @@ std::int32_t umbc::Menu::menu_mode() {
     }
 
     pros::lcd::clear();
-    return menu_direction;
+    return umbc::Robot::Mode::NONE; // change to actually returned
 }
 
 umbc::Menu::Menu(umbc::Robot* robot) {
@@ -98,7 +98,7 @@ umbc::Menu::Menu(umbc::Robot* robot) {
 
 void umbc::Menu::robot_menu() {
 
-    std::uint8_t current_sub_menu = MENU_COMPETITION;
+    umbc::Menu::SubMenu current_sub_menu = umbc::Menu::SubMenu::MATCH;
 
     if (!pros::lcd::is_initialized()) {
         ERROR("failed to initialize LCD menu");
@@ -107,14 +107,16 @@ void umbc::Menu::robot_menu() {
 
     pros::lcd::clear();
 
-    while (MENU_MAX > current_sub_menu) {
+    while (umbc::Menu::SubMenu::MAX > current_sub_menu) {
 
         switch (current_sub_menu) {
-            case MENU_COMPETITION:
-                current_sub_menu += menu_competition();
+            case umbc::Menu::SubMenu::MATCH:
+                current_sub_menu = umbc::Robot::MatchType::NONE == menu_match() 
+                    ? current_sub_menu : umbc::Menu::SubMenu::MODE;
             break;
-            case MENU_MODE:
-                current_sub_menu += menu_mode();
+            case umbc::Menu::SubMenu::MODE:
+                current_sub_menu = umbc::Robot::Mode::NONE == menu_mode()
+                    ? umbc::Menu::SubMenu::MATCH : umbc::Menu::SubMenu::MAX;
             break;
             default:
                 break;

@@ -17,8 +17,8 @@ using namespace umbc;
 using namespace std;
 
 umbc::Robot::Robot() {
-    this->match_type = umbc::MatchType::TOURNAMENT;
-    this->mode = umbc::RobotMode::COMPETITION;
+    this->match_type = umbc::Robot::MatchType::TOURNAMENT;
+    this->mode = umbc::Robot::Mode::COMPETITION;
 }
 
 void umbc::Robot::set_controllers_to_physical() {
@@ -31,19 +31,19 @@ void umbc::Robot::set_controllers_to_virtual() {
     this->controller_partner = &(this->vcontroller_partner);
 }
 
-umbc::MatchType umbc::Robot::get_match_type() {
+umbc::Robot::MatchType umbc::Robot::get_match_type() {
     return this->match_type;
 }
 
-void umbc::Robot::set_match_type(umbc::MatchType match_type) {
+void umbc::Robot::set_match_type(umbc::Robot::MatchType match_type) {
     this->match_type = match_type;
 }
     
-umbc::RobotMode umbc::Robot::get_mode() {
+umbc::Robot::Mode umbc::Robot::get_mode() {
     return this->mode;
 }
 
-void umbc::Robot::set_mode(umbc::RobotMode mode) {
+void umbc::Robot::set_mode(umbc::Robot::Mode mode) {
     this->mode = mode;
 }
 
@@ -59,7 +59,7 @@ void umbc::Robot::autonomous(bool is_partner_controller) {
 	this->set_controllers_to_virtual();
 	INFO("robot controllers set to virtual controllers");
 
-    if (umbc::MatchType::SKILLS == this->match_type) {
+    if (umbc::Robot::MatchType::SKILLS == this->match_type) {
         INFO("loading skills input file for virtual master controller...");
         this->vcontroller_master.load(this->skills_autonomous_file_master);
         INFO("loaded " << skills_autonomous_file_master << " as input file for virtual master controller");
@@ -134,7 +134,7 @@ void umbc::Robot::train_autonomous(bool is_partner_controller) {
         INFO("recording partner controller has begun");
     }
 
-    if (umbc::MatchType::SKILLS == this->match_type) {
+    if (umbc::Robot::MatchType::SKILLS == this->match_type) {
         INFO("setting task delay for skills autonomous time...");
         pros::Task::delay(this->skills_autonomous_time_ms);
         INFO("task delay set to " << this->skills_autonomous_time_ms << " ms");
@@ -159,7 +159,7 @@ void umbc::Robot::train_autonomous(bool is_partner_controller) {
     }
 
     INFO("saving master controller file...");
-    if (umbc::MatchType::SKILLS == this->match_type) {
+    if (umbc::Robot::MatchType::SKILLS == this->match_type) {
         controller_recorder_master.save(this->skills_autonomous_file_master);
         INFO("master controller file saved to " << this->skills_autonomous_file_master);
         if (is_partner_controller) {

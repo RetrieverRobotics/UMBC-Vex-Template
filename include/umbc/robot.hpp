@@ -22,24 +22,33 @@ using namespace std;
 
 namespace umbc {
 
-    enum class MatchType : std::int32_t {
-        TOURNAMENT = 0,
-        SKILLS = 1
-    };
-
-
-    
-    enum class RobotMode : std::int32_t {
-        COMPETITION = 0,
-        TRAIN_AUTONOMOUS = 1
-    };
-
-
     /**
      * Holds various values for determining different modes. Contains functions for autonomous,
      * training autonomous, and opcontrol. Allows for basic control of the opcontrol task
      */
     class Robot {
+
+        public:
+
+            /**
+             * Match types
+             */
+            enum class MatchType : std::int32_t {
+                NONE = -1,          // invalid match type
+                TOURNAMENT = 0,     // practice, qualification or elimination match
+                SKILLS = 1          // skills match
+            };
+
+
+            /**
+             * Robot modes
+             */    
+            enum class Mode : std::int32_t {
+                NONE = -1,              // invalid robot mode
+                COMPETITION = 0,        // competition or practice mode
+                TRAIN_AUTONOMOUS = 1    // train autonomous mode
+            };
+
         
         private:
 
@@ -64,10 +73,11 @@ namespace umbc {
             // amount of time in milliseconds for an autonomous skills match
             static constexpr std::uint32_t skills_autonomous_time_ms = 60000;
 
-            static constexpr std::uint32_t opcontrol_delay_ms = 10; // delay in milliseconds when continuously polling controller input
+            // delay in milliseconds when continuously polling controller input
+            static constexpr std::uint32_t opcontrol_delay_ms = 10; 
 
-            umbc::MatchType match_type; // current match type
-            umbc::RobotMode mode;       // current mode
+            umbc::Robot::MatchType match_type;  // current match type
+            umbc::Robot::Mode mode;             // current mode
 
             // physical version of master controller
             umbc::PController pcontroller_master = umbc::PController(E_CONTROLLER_MASTER);
@@ -117,28 +127,28 @@ namespace umbc {
              * 
              * @return Current match type
             */
-            umbc::MatchType get_match_type();
+            umbc::Robot::MatchType get_match_type();
 
             /**
              * @brief Set match type
              * 
              * @param match_type: match type
             */
-            void set_match_type(umbc::MatchType match_type);
+            void set_match_type(umbc::Robot::MatchType match_type);
 
             /**
              * @brief Retrieve current robot mode
              * 
              * @return Current robot mode
             */
-            umbc::RobotMode get_mode();
+            umbc::Robot::Mode get_mode();
 
             /**
              * @brief Set robot mode
              * 
              * @param mode: Robot mode
             */
-            void set_mode(umbc::RobotMode mode);
+            void set_mode(umbc::Robot::Mode mode);
 
             /**
              * @brief Performs robot actions via a preset routine

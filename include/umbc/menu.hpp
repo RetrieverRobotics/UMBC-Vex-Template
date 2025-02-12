@@ -1,64 +1,74 @@
 /**
- * \file umbc/menu.hpp
+ * @file umbc/menu.hpp
  *
  * Contains the prototype for the menu system. The Menu class contains
- * various sub-menus for putting the robot in different modes and 
- * configuring settings.
+ * various sub-menus for putting the robot into different modes.
  */
 
 #ifndef _UMBC_MENU_HPP_
 #define _UMBC_MENU_HPP_
 
+// standard libraries
+#include <cstdint>
+
+// local header files
 #include "api.h"
 #include "robot.hpp"
 
-#include <cstdint>
-
+// namespaces used
 using namespace pros;
 using namespace std;
 
+
 namespace umbc {
-typedef enum {
-    MENU_COMPETITION = 0,
-    MENU_MODE = 1,
-    MENU_MAX
-} sub_menu;
-
-class Menu {
-
-    private:
-    umbc::Robot* robot = nullptr;
 
     /**
-     * Menu to select the competition type using the LLEMU.
-     * 
-     * \returns always 1
+     * Contains various sub-menus for setting the robot's different modes
      */
-    std::int32_t menu_competition();
+    class Menu {
 
-    /**
-     * Menu to select the mode using the LLEMU.
-     * 
-     * \returns 1 if a selection was made, otherwise -1.
-     */
-    std::int32_t menu_mode();
+        private:
 
-    public:
+            /**
+             * Sub-menu identifiers
+             */
+            enum class SubMenu : std::int32_t {
+                MATCH = 0,  // sub-menu for selecting match type
+                MODE = 1,   // sub-menu for selecting robot mode
+                MAX         // delete when refactoring
+            };
+        
+            umbc::Robot* robot = nullptr;   // reference to robot being configured by the menu
 
-    /**
-     * Creates a menu object.
-     * 
-     * \param robot
-     *          A reference to the robot object the menu will manipulate.
-     */
-    Menu(umbc::Robot* robot);
+            /**
+             * @brief Menu to select the competition type using the LLEMU
+             * 
+             * @returns Match type that was selected. Otherwise umbc::MatchType::NONE
+             */
+            umbc::Robot::MatchType menu_match();
 
-    /**
-     * Menu for selecting mode, competition, alliance, and starting
-     * position useing the LLEMU.
-     */
-    void robot_menu();
-};
+            /**
+             * @brief Menu to select the robot mode using the LLEMU
+             * 
+             * @returns Robot mode that was selected. Otherwise umbc::RobotMode::NONE
+             */
+            umbc::Robot::Mode menu_mode();
+
+
+        public:
+
+            /**
+             * @brief Creates a menu object
+             * 
+             * @param robot: Reference to the robot object the menu will configure
+             */
+            Menu(umbc::Robot* robot);
+
+            /**
+             * @brief Menu for selecting robot mode and match type useing the LLEMU
+             */
+            void robot_menu();
+    };
 }
 
 #endif // _UMBC_MENU_HPP_
