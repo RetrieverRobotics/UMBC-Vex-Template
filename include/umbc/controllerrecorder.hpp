@@ -1,5 +1,5 @@
 /**
- * \file umbc/controllerrecorder.hpp
+ * @file umbc/controllerrecorder.hpp
  *
  * Contains the prototype for the ControllerRecorder. ControllerRecorder
  * saves controller input at set poll rate. The files created by the
@@ -9,113 +9,114 @@
 #ifndef _UMBC_CONTROLLER_RECORDER_HPP_
 #define _UMBC_CONTROLLER_RECORDER_HPP_
 
+// standard libraries
+#include <cstdint>
+#include <queue>
+
+// local header files
 #include "controller.hpp"
 #include "controllerinput.hpp"
 #include "api.h"
 
-#include <cstdint>
-#include <queue>
-
+// namespaces used
 using namespace pros;
 using namespace std;
 
 namespace umbc {
-class ControllerRecorder {
-
-    private:
-    static constexpr char* t_record_controller_input_name =  (char*)"controllerrecorder";
-
-    std::uint16_t poll_rate_ms;
-    umbc::Controller* controller;
-    std::queue<ControllerInput> controller_input;
-    std::unique_ptr<Task> t_record_controller_input;
 
     /**
-	 * Pushes current controller input to the controller input queue at the
-     * set poll rate.
-	 * 
-	 * This function is intended to be used as a task, which is why it is
-	 * static.
-     * 
-     * This will continue to record until stop is called or the number of
-     * recorded inputs reached INT32_MAX.
-	 * 
-	 * \param ControllerRecorder
-	 * 			The controller recorder who will be saving controller input.
-     *          The type for this parameter must be ControllerRecorder.
-     *          Intended to be 'this' pointer.
-	 */
-	static void record(void* ControllerRecorder);
-
-    public:
-    /**
-	 * Creates a controller recorder object.
-     * 
-     * \param controller
-	 *      The controller to record.
-     * 
-     * \param poll_rate_ms
-     *      The rate in milliseconds controller input will be polled at.
-     *           
-	 */
-    ControllerRecorder(umbc::Controller* controller, std::uint16_t poll_rate_ms);
-
-    /**
-     * Saves the poll rate and recorded controller input into a binary file.
-     * 
-     * This method is destructive and will clear all recorded controller
-     * input.
-     * 
-     * \param file_path
-     *      The file path that the binary file will be created and saved at. If
-     *      a file already exists at this location, it will be overwritten.
-     * 
-     * \return Number of controller inputs written to the file, otherwise -1 on
-     * failure.
+     * Records controller input at a set poll rate and saves it to a binary file
      */
-    std::int32_t save(const char* file_path);
+    class ControllerRecorder {
 
-    /**
-     * Starts recording controller input.
-     */
-	void start();
+        private:
 
-    /**
-     * Pauses recording controller input if controller recording is currently
-     * active.
-     */
-	void pause();
+            // name of the task that records controller input
+            static constexpr char* t_record_controller_input_name =  (char*)"controllerrecorder";
 
-    /**
-     * Resumes recording controller input if controller recording is currently
-     * paused.
-     */
-	void resume();
+            std::uint16_t poll_rate_ms;                         // rate in milliseconds the controller is polled
+            umbc::Controller* controller;                       // controller being recorded
+            std::queue<ControllerInput> controller_input;       // queue to save controller input
+            std::unique_ptr<Task> t_record_controller_input;    // task for polling controller input at the poll rate
 
-    /**
-     * Stops recording controller input.
-     */
-	void stop();
+            /**
+             * @brief Pushes current controller input to a queue at the set poll rate
+             * 
+             * @param ControllerRecorder: The controller recorder that will be saving controller
+             *      input. The type for this parameter must be ControllerRecorder. Intended to be
+             *      'this' pointer.
+             * 
+             * @note This function is intended to be used as a task, which is why it is static.
+             * @note This will continue to record until stop is called or the number of recorded
+             *      inputs reached INT32_MAX.
+             */
+            static void record(void* ControllerRecorder);
 
-    /**
-     * Clears the controller input buffer.
-     */
-    void reset();
 
-    /**
-     * Checks if currently recording.
-     * 
-     * \return 1 if currently recording, otherwise 0
-     */
-    std::int32_t isRecording();
+        public:
 
-    /**
-     * Checks if there is any controller input that has been recorded.
-     * 
-     * \return 1 if there is controller input recorded, otherwise 0 
-     */
-    std::int32_t hasControllerInput();
-};
+            /**
+             * @brief Creates a controller recorder object
+             * 
+             * @param controller: controller to record
+             * 
+             * @param poll_rate_ms: Rate in milliseconds controller input will be polled at       
+             */
+            ControllerRecorder(umbc::Controller* controller, std::uint16_t poll_rate_ms);
+
+            /**
+             * @brief Saves the poll rate and recorded controller input into a binary file
+             * 
+             * @param file_path: File path that the binary file will be created and saved at. 
+             * 
+             * @return Number of controller inputs written to the file. Otherwise -1 on
+             *      failure
+             * 
+             * @note This method is destructive and will clear all recorded controller
+             *      input.
+             * @note If a file already exists at the file path location, it will be overwritten.
+             */
+            std::int32_t save(const char* file_path);
+
+            /**
+             * @brief Starts recording controller input
+             */
+            void start();
+
+            /**
+             * @brief Pauses recording controller input if recording is currently active
+             */
+            void pause();
+
+            /**
+             * @brief Resumes recording controller input if recording is currently paused
+             */
+            void resume();
+
+            /**
+             * @brief Stops recording controller input
+             */
+            void stop();
+
+            /**
+             * @brief Clears the controller input buffer
+             */
+            void reset();
+
+            /**
+             * @brief Checks if currently recording
+             * 
+             * @return True if currently recording. Otherwise false
+             */
+            bool isRecording();
+
+            /**
+             * @brief Checks if there is any controller input that has been recorded
+             * 
+             * @return True if there is controller input recorded. Otherwise false 
+             */
+            bool isControllerInput();
+    };
 }
 
 #endif // _UMBC_CONTROLLER_RECORDER_HPP_

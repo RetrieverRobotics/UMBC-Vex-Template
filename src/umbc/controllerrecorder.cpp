@@ -183,13 +183,13 @@ void umbc::ControllerRecorder::reset() {
     this->controller_input = queue<ControllerInput>();
 }
 
-std::int32_t umbc::ControllerRecorder::isRecording() {
+bool umbc::ControllerRecorder::isRecording() {
 
     Task* t_record = this->t_record_controller_input.get();
 
-    return (nullptr == t_record) ? 0 : t_record->get_state() == E_TASK_STATE_RUNNING;
+    return (nullptr == t_record) ? false : (t_record->get_state() == E_TASK_STATE_RUNNING);
 }
 
-std::int32_t umbc::ControllerRecorder::hasControllerInput() {
+bool umbc::ControllerRecorder::isControllerInput() {
     return !this->controller_input.empty();
 }
