@@ -1,5 +1,9 @@
 /**
+<<<<<<< HEAD
  * @file umbc/vcontroller.hpp
+=======
+ * \file umbc/vcontroller.hpp
+>>>>>>> ac56c5b00ef790b55443ed4abad5c3499d83ead7
  *
  * Contains the prototype for the VController. The VController emulates
  * user controller input through reading a formatted binary file of
