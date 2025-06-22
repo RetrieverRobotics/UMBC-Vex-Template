@@ -1,20 +1,23 @@
-#include "main.h"
-
 /**
- * A callback function for LLEMU's center button.
+ * \file main.cpp
  *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
+ * Contains the main functions for the robot for the Vex Robotics
+ * Competition.
  */
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
-}
+
+ #include <iostream>
+
+#include "main.h"
+#include "api.h"
+#include "umbc.h"
+
+#define PARTNER_CONTROLLER 0
+
+using namespace pros;
+using namespace umbc;
+using namespace std;
+
+umbc::Robot robot = Robot();
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -23,10 +26,12 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
 
-	pros::lcd::register_btn1_cb(on_center_button);
+	INFO("initializing robot...");
+
+	pros::lcd::initialize();
+
+	INFO("robot initialized");
 }
 
 /**
@@ -34,7 +39,19 @@ void initialize() {
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
-void disabled() {}
+void disabled() {
+
+	INFO("disabling robot...");
+
+	pros::lcd::clear();
+	pros::lcd::set_text(1, "Robot Disabled");
+
+	if (robot.opcontrol_isListed()) {
+		robot.opcontrol_stop();
+	}
+
+	INFO("robot disabled");
+}
 
 /**
  * Runs after initialize(), and before autonomous when connected to the Field
@@ -45,7 +62,15 @@ void disabled() {}
  * This task will exit when the robot is enabled and autonomous or opcontrol
  * starts.
  */
-void competition_initialize() {}
+void competition_initialize() {
+	
+	INFO("performing competition initialization...");
+
+	pros::lcd::clear();
+	robot.menu();
+
+	INFO("competition initialization completed");
+}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -58,7 +83,17 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+
+	INFO("performing autonomous routine...");
+
+	pros::lcd::clear();
+	pros::lcd::set_text(1, "Autonomous Active");
+	robot.autonomous(PARTNER_CONTROLLER);
+	pros::lcd::clear();
+	
+	INFO("autonomous routine completed");
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -74,20 +109,40 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::Motor left_mtr(1);
-	pros::Motor right_mtr(2);
 
-	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);
-		int left = master.get_analog(ANALOG_LEFT_Y);
-		int right = master.get_analog(ANALOG_RIGHT_Y);
+	if (robot.opcontrol_isListed()) {
+		robot.opcontrol_stop();
+	}
 
-		left_mtr = left;
-		right_mtr = right;
+	while (1) {
+		pros::lcd::clear();
 
-		pros::delay(20);
+		INFO("setting robot controllers to physical controllers...");
+		robot.set_controllers_to_physical();
+		INFO("robot controllers set to physical controllers");
+
+		if (MODE_TRAIN_AUTONOMOUS == robot.get_mode()) {
+			INFO("autonomous training starting...");
+			if (pros::usd::is_installed()) {
+				pros::lcd::set_text(1, "Autonomous Training Active");
+				robot.train_autonomous(PARTNER_CONTROLLER);
+				pros::lcd::clear();
+    			pros::lcd::set_text(1, "Autonomous Training Complete");
+    			INFO("autonomous training complete");
+				pros::Task::delay(MSG_DELAY_MS);
+				competition_initialize();
+			} else {
+				ERROR("autonomous training failed; no SD Card detected");
+				pros::lcd::clear();
+				pros::lcd::set_text(1, "No SD Card Detected!");
+				pros::lcd::set_text(3, "Power off V5 Brain and insert");
+				pros::lcd::set_text(4, "SD Card.");
+				return;
+			}
+		} else {
+			pros::lcd::set_text(1, "Opcontrol Active");
+			INFO("opcontrol active");
+			robot.opcontrol();
+		}
 	}
 }
