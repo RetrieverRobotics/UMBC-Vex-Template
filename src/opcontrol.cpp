@@ -1,19 +1,23 @@
 /**
- * \file opcontrol.cpp
+ * @file opcontrol.cpp
  *
  * Contains user implemented opcontrol. User must use the
  * parameters to the opcontrol function when referencing
  * the master V5 controller or partner V5 controller.
  */
 
+// standard libraries
+#include <cstdint>
+
+// local header files
 #include "api.h"
 #include "umbc.h"
 
-#include <cstdint>
-
+// namespaces used
 using namespace pros;
 using namespace umbc;
 using namespace std;
+
 
 void umbc::Robot::opcontrol() {
 
@@ -22,8 +26,9 @@ void umbc::Robot::opcontrol() {
     umbc::Controller* controller_partner = this->controller_partner;
 
     // initialize motors and sensors
+    
 
-
+    // opcontrol loop
     while(1) {
 
         // implement opcontrols
