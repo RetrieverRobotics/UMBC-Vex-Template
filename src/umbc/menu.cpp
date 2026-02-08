@@ -32,7 +32,7 @@ umbc::Robot::MatchType umbc::Menu::menu_match() {
 
     // continue polling LCD buttons until one is pressed
     INFO("waiting for match type selection...");
-    while(0 == btn_press) {
+    while (0 == btn_press) {
 
         // check if any LCD buttons have been pressed
         btn_press = pros::lcd::read_buttons();
@@ -84,7 +84,7 @@ umbc::Robot::Mode umbc::Menu::menu_mode() {
     
     // continue polling LCD buttons until one is pressed
     INFO("waiting for mode selection...");
-    while(0 == btn_press) {
+    while (0 == btn_press) {
 
         // check if any LCD buttons have been pressed
         btn_press = pros::lcd::read_buttons();

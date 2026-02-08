@@ -29,7 +29,7 @@ void umbc::Robot::opcontrol() {
     
 
     // opcontrol loop
-    while(1) {
+    while (true) {
 
         // implement opcontrols
 

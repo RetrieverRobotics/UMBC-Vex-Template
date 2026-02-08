@@ -138,7 +138,7 @@ std::int32_t umbc::VController::load(const char* file_path) {
     INFO("poll rate is " + std::to_string(this->poll_rate_ms) + "ms");
 
     INFO("loading in controller data from " + file_path_str + "...");
-    while(1) {
+    while (true) {
 
         ControllerInput controller_input;
         file.read((char*)(&controller_input), sizeof(controller_input)); 
