@@ -8,16 +8,20 @@
 #ifndef _FILE_EXPLORER_HPP_
 #define _FILE_EXPLORER_HPP_
 
-#include "api.h"
-#include "robot.hpp"
-
+// standard libraries
 #include <cstdint>
 #include <string>
 #include <map>
 #include <list>
 
+// local header files
+#include "api.h"
+#include "robot.hpp"
+
+// namespaces used
 using namespace pros;
 using namespace std;
+
 
 namespace umbc {
 
@@ -45,7 +49,7 @@ namespace umbc {
             /**
              * Error codes for the FileExplorer Class
              */
-            enum class Result {
+            enum class Result : std::int32_t {
                 OK = 0,                 // success
                 ERROR = 1,              // generic error
                 ERROR_INVALID_DIR = 2,  // directory does not exist
