@@ -148,7 +148,7 @@ void umbc::Menu::robot_menu() {
     pros::lcd::clear();
 
     // continue until end of sub-menues
-    while (umbc::Menu::SubMenu::NONE == current_sub_menu) {
+    while (umbc::Menu::SubMenu::NONE != current_sub_menu) {
 
         // display current menu
         switch (current_sub_menu) {
