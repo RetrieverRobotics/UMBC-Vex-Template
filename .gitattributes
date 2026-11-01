@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+*.a binary
+*.bin binary
+*.elf binary
+*.o binary
+*.obj binary
