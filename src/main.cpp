@@ -81,7 +81,7 @@ void competition_initialize() {
 	
 	INFO("performing competition initialization...");
 
-	// display robot menu on the LLEMU for selecting match type and mode
+	// display robot menu on the LLEMU for selecting match type, mode and alliance color
 	umbc::clear_lcd();
 	Menu menu = Menu(&robot);
 	menu.robot_menu();

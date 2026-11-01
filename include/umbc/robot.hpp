@@ -41,6 +41,16 @@ namespace umbc {
 
 
             /**
+             * Alliance colors
+             */
+            enum class AllianceColor : std::int32_t {
+                NONE = -1,  // no alliance color
+                RED = 0,    // red alliance
+                BLUE = 1    // blue alliance
+            };
+
+
+            /**
              * Robot modes
              */    
             enum class Mode : std::int32_t {
@@ -77,6 +87,7 @@ namespace umbc {
             static constexpr std::uint32_t opcontrol_delay_ms = 10; 
 
             umbc::Robot::MatchType match_type;  // current match type
+            umbc::Robot::AllianceColor alliance_color;  // current alliance color
             umbc::Robot::Mode mode;             // current mode
 
             // physical version of master controller
@@ -135,6 +146,20 @@ namespace umbc {
              * @param match_type: match type
             */
             void set_match_type(umbc::Robot::MatchType match_type);
+
+            /**
+             * @brief Retrieve current alliance color
+             *
+             * @return Current alliance color
+            */
+            umbc::Robot::AllianceColor get_alliance_color();
+
+            /**
+             * @brief Set alliance color
+             *
+             * @param alliance_color: Alliance color
+            */
+            void set_alliance_color(umbc::Robot::AllianceColor alliance_color);
 
             /**
              * @brief Retrieve current robot mode

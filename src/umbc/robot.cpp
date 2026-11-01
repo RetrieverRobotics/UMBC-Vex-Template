@@ -22,6 +22,7 @@ using namespace std;
 
 umbc::Robot::Robot() {
     this->match_type = umbc::Robot::MatchType::TOURNAMENT;
+    this->alliance_color = umbc::Robot::AllianceColor::NONE;
     this->mode = umbc::Robot::Mode::COMPETITION;
 }
 
@@ -45,6 +46,21 @@ umbc::Robot::MatchType umbc::Robot::get_match_type() {
 
 void umbc::Robot::set_match_type(umbc::Robot::MatchType match_type) {
     this->match_type = match_type;
+
+    // clear alliance color when not selecting a tournament match
+    if (umbc::Robot::MatchType::TOURNAMENT != match_type) {
+        this->alliance_color = umbc::Robot::AllianceColor::NONE;
+    }
+}
+
+
+umbc::Robot::AllianceColor umbc::Robot::get_alliance_color() {
+    return this->alliance_color;
+}
+
+
+void umbc::Robot::set_alliance_color(umbc::Robot::AllianceColor alliance_color) {
+    this->alliance_color = alliance_color;
 }
 
 
