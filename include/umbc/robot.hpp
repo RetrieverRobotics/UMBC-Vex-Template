@@ -155,11 +155,18 @@ namespace umbc {
             umbc::Robot::AllianceColor get_alliance_color();
 
             /**
-             * @brief Set alliance color
+             * @brief Set alliance color and update LCD colors if initialized
              *
              * @param alliance_color: Alliance color
             */
             void set_alliance_color(umbc::Robot::AllianceColor alliance_color);
+
+            /**
+             * @brief Updates LCD colors for the current alliance
+             *
+             * @note No alliance restores the bundled LLEMU's default green background and dark text.
+            */
+            void update_lcd_colors();
 
             /**
              * @brief Retrieve current robot mode

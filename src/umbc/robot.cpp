@@ -49,7 +49,7 @@ void umbc::Robot::set_match_type(umbc::Robot::MatchType match_type) {
 
     // clear alliance color when not selecting a tournament match
     if (umbc::Robot::MatchType::TOURNAMENT != match_type) {
-        this->alliance_color = umbc::Robot::AllianceColor::NONE;
+        this->set_alliance_color(umbc::Robot::AllianceColor::NONE);
     }
 }
 
@@ -61,6 +61,37 @@ umbc::Robot::AllianceColor umbc::Robot::get_alliance_color() {
 
 void umbc::Robot::set_alliance_color(umbc::Robot::AllianceColor alliance_color) {
     this->alliance_color = alliance_color;
+
+    if (true == pros::lcd::is_initialized()) {
+        this->update_lcd_colors();
+    }
+}
+
+
+void umbc::Robot::update_lcd_colors() {
+
+    switch (this->alliance_color) {
+
+        case umbc::Robot::AllianceColor::RED: {
+            umbc::set_lcd_colors(pros::Color::red, pros::Color::white);
+            break;
+        }
+
+        case umbc::Robot::AllianceColor::BLUE: {
+            umbc::set_lcd_colors(pros::Color::blue, pros::Color::white);
+            break;
+        }
+
+        case umbc::Robot::AllianceColor::NONE: {
+            umbc::reset_lcd_colors();
+            break;
+        }
+
+        default: {
+            ERROR("cannot update LCD colors; invalid alliance color");
+            break;
+        }
+    }
 }
 
 

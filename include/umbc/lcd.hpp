@@ -12,6 +12,7 @@
 
 // local header files
 #include "api.h"
+#include "pros/colors.hpp"
 
 // namespaces used
 using namespace pros;
@@ -27,6 +28,19 @@ namespace umbc {
      *      subsequent set_text() calls still use.
      */
     void clear_lcd();
+
+    /**
+     * @brief Sets the LCD text panel's background and text colors
+     *
+     * @param background_color: Background color
+     * @param text_color: Text color
+     */
+    void set_lcd_colors(pros::Color background_color, pros::Color text_color);
+
+    /**
+     * @brief Restores the LCD text panel's original background and text colors
+     */
+    void reset_lcd_colors();
 
     /**
      * @brief Reads the three LCD buttons, masking unused state bits

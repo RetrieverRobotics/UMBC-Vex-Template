@@ -37,6 +37,7 @@ void initialize() {
 
 	// initialize the LLEMU
 	pros::lcd::initialize();
+	robot.update_lcd_colors();
 
 	INFO("robot initialized");
 }
