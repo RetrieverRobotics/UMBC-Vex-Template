@@ -70,6 +70,64 @@ umbc::Robot::MatchType umbc::Menu::menu_match() {
 }
 
 
+umbc::Robot::AllianceColor umbc::Menu::menu_alliance() {
+
+    umbc::Robot::AllianceColor alliance_color = umbc::Robot::AllianceColor::NONE;
+    std::uint8_t btn_press = 0;
+
+    // display alliance color sub-menu on the LCD
+    umbc::clear_lcd();
+    pros::lcd::set_text(1, "Select Alliance Color");
+    pros::lcd::set_text(3, "1) Red");
+    pros::lcd::set_text(4, "2) Blue");
+    pros::lcd::set_text(5, "3) Back");
+
+    // continue polling LCD buttons until one is pressed
+    INFO("waiting for alliance color selection...");
+    while (0 == btn_press) {
+
+        // check if any LCD buttons have been pressed
+        btn_press = umbc::read_lcd_buttons();
+
+        // red alliance selected
+        if (LCD_BTN_LEFT == btn_press) {
+            alliance_color = umbc::Robot::AllianceColor::RED;
+            INFO("red selected for alliance color");
+        }
+
+        // blue alliance selected
+        else if (LCD_BTN_CENTER == btn_press) {
+            alliance_color = umbc::Robot::AllianceColor::BLUE;
+            INFO("blue selected for alliance color");
+        }
+
+        // no alliance color selected
+        else if (LCD_BTN_RIGHT == btn_press) {
+            alliance_color = umbc::Robot::AllianceColor::NONE;
+            INFO("no alliance color selected");
+        }
+
+        // no valid alliance colors selected
+        else {
+            btn_press = 0;
+        }
+
+        // polling delay to not hog processor
+        pros::Task::delay(this->lcd_btn_polling_delay_ms);
+    }
+
+    // wait for the LCD button to be released
+    while (0 != umbc::read_lcd_buttons()) {
+        pros::Task::delay(this->lcd_btn_polling_delay_ms);
+    }
+
+    // clear the LCD
+    umbc::clear_lcd();
+
+    return alliance_color;
+}
+
+
 umbc::Robot::Mode umbc::Menu::menu_mode() {
 
     umbc::Robot::Mode mode = umbc::Robot::Mode::NONE;
@@ -167,7 +225,25 @@ void umbc::Menu::robot_menu() {
                 }
 
                 // continue to robot mode sub-menu
-                current_sub_menu = umbc::Menu::SubMenu::MODE;    
+                current_sub_menu = umbc::Menu::SubMenu::MODE;
+                break;
+            }
+
+            // alliance color sub-menu
+            case umbc::Menu::SubMenu::ALLIANCE: {
+
+                // set robot's alliance color
+                umbc::Robot::AllianceColor alliance_color = this->menu_alliance();
+                this->robot->set_alliance_color(alliance_color);
+
+                // go back to robot mode sub-menu
+                if (umbc::Robot::AllianceColor::NONE == alliance_color) {
+                    current_sub_menu = umbc::Menu::SubMenu::MODE;
+                    break;
+                }
+
+                // end of sub-menus
+                current_sub_menu = umbc::Menu::SubMenu::NONE;
                 break;
             }
             
@@ -184,8 +260,15 @@ void umbc::Menu::robot_menu() {
                     break;
                 }
 
-                // end of sub-menus
-                current_sub_menu = umbc::Menu::SubMenu::NONE;
+                // select alliance color for tournament matches
+                if (umbc::Robot::MatchType::TOURNAMENT == this->robot->get_match_type()) {
+                    current_sub_menu = umbc::Menu::SubMenu::ALLIANCE;
+                }
+
+                // end of sub-menus for skills matches
+                else {
+                    current_sub_menu = umbc::Menu::SubMenu::NONE;
+                }
                 break;
             }
             
