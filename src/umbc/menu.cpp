@@ -25,7 +25,7 @@ umbc::Robot::MatchType umbc::Menu::menu_match() {
     std::uint8_t btn_press = 0;
 
     // display match type menu on the LCD
-    pros::lcd::clear();
+    umbc::clear_lcd();
     pros::lcd::set_text(1, "Select Match Type");
     pros::lcd::set_text(3, "1) Tournament");
     pros::lcd::set_text(4, "2) Skills");
@@ -35,7 +35,7 @@ umbc::Robot::MatchType umbc::Menu::menu_match() {
     while (0 == btn_press) {
 
         // check if any LCD buttons have been pressed
-        btn_press = pros::lcd::read_buttons();
+        btn_press = umbc::read_lcd_buttons();
         
         // set robot's match type to tournament
         if (LCD_BTN_LEFT == btn_press) {
@@ -59,12 +59,12 @@ umbc::Robot::MatchType umbc::Menu::menu_match() {
     }
 
     // wait for the LCD button to be released
-    while (0 != pros::lcd::read_buttons()) {
+    while (0 != umbc::read_lcd_buttons()) {
         pros::Task::delay(this->lcd_btn_polling_delay_ms);
     }
 
     // clear the LCD
-    pros::lcd::clear();
+    umbc::clear_lcd();
 
     return match_type;
 }
@@ -76,7 +76,7 @@ umbc::Robot::Mode umbc::Menu::menu_mode() {
     std::uint8_t btn_press = 0;
 
     // display robot mode sub-menu on the LCD
-    pros::lcd::clear();
+    umbc::clear_lcd();
     pros::lcd::set_text(1, "Select Mode");
     pros::lcd::set_text(3, "1) Competition");
     pros::lcd::set_text(4, "2) Train Autonomous");
@@ -87,7 +87,7 @@ umbc::Robot::Mode umbc::Menu::menu_mode() {
     while (0 == btn_press) {
 
         // check if any LCD buttons have been pressed
-        btn_press = pros::lcd::read_buttons();
+        btn_press = umbc::read_lcd_buttons();
         
         // competition robot mode selected
         if (LCD_BTN_LEFT == btn_press) {
@@ -117,12 +117,12 @@ umbc::Robot::Mode umbc::Menu::menu_mode() {
     }
 
     // wait for the LCD button to be released
-    while (0 != pros::lcd::read_buttons()) {
+    while (0 != umbc::read_lcd_buttons()) {
         pros::Task::delay(this->lcd_btn_polling_delay_ms);
     }
 
     // clear the LCD
-    pros::lcd::clear();
+    umbc::clear_lcd();
 
     return mode;
 }
@@ -145,10 +145,10 @@ void umbc::Menu::robot_menu() {
     }
 
     // clear the LCD
-    pros::lcd::clear();
+    umbc::clear_lcd();
 
     // continue until end of sub-menues
-    while (umbc::Menu::SubMenu::NONE == current_sub_menu) {
+    while (umbc::Menu::SubMenu::NONE != current_sub_menu) {
 
         // display current menu
         switch (current_sub_menu) {
@@ -198,12 +198,12 @@ void umbc::Menu::robot_menu() {
     }
 
     // display all required selections have been completed on the LCD
-    pros::lcd::clear();
+    umbc::clear_lcd();
     pros::lcd::set_text(1, "Selection Complete");
     pros::Task::delay(MSG_DELAY_MS);
 
     // clear LCD menu
-    pros::lcd::clear();
+    umbc::clear_lcd();
 
     INFO("menu selections completed");
 }
