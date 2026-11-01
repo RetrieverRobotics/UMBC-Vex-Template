@@ -19,6 +19,7 @@
 #include "umbc/robot.hpp"
 #include "umbc/vcontroller.hpp"
 #include "umbc/log.hpp"
+#include "umbc/lcd.hpp"
 #include "umbc/menu.hpp"
 #endif
 

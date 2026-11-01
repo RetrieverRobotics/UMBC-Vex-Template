@@ -54,7 +54,7 @@ void disabled() {
 	INFO("disabling robot...");
 
 	// display disabled message on the LLEMU
-	pros::lcd::clear();
+	umbc::clear_lcd();
 	pros::lcd::set_text(1, "Robot Disabled");
 
 	// stop the opcontrol task if it is currently active
@@ -82,7 +82,7 @@ void competition_initialize() {
 	INFO("performing competition initialization...");
 
 	// display robot menu on the LLEMU for selecting match type and mode
-	pros::lcd::clear();
+	umbc::clear_lcd();
 	Menu menu = Menu(&robot);
 	menu.robot_menu();
 
@@ -108,10 +108,10 @@ void autonomous() {
 	INFO("performing autonomous routine...");
 
 	// perform trained autonomous routine
-	pros::lcd::clear();
+	umbc::clear_lcd();
 	pros::lcd::set_text(1, "Autonomous Active");
 	robot.autonomous(PARTNER_CONTROLLER);
-	pros::lcd::clear();
+	umbc::clear_lcd();
 	
 	INFO("autonomous routine completed");
 }
@@ -142,7 +142,7 @@ void opcontrol() {
 	// main opcontrol loop
 	while (true) {
 
-		pros::lcd::clear();
+		umbc::clear_lcd();
 
 		// set robot controllers to physical controllers
 		INFO("setting robot controllers to physical controllers...");
@@ -157,7 +157,7 @@ void opcontrol() {
 			// check that an SD card is installed
 			if (0 == pros::usd::is_installed()) {
 				ERROR("autonomous training failed; no SD Card detected");
-				pros::lcd::clear();
+				umbc::clear_lcd();
 				pros::lcd::set_text(1, "No SD Card Detected!");
 				pros::lcd::set_text(3, "Power off V5 Brain and insert");
 				pros::lcd::set_text(4, "SD Card.");
@@ -167,7 +167,7 @@ void opcontrol() {
 			// train autonomous routine
 			pros::lcd::set_text(1, "Autonomous Training Active");
 			robot.train_autonomous(PARTNER_CONTROLLER);
-			pros::lcd::clear();
+			umbc::clear_lcd();
 			pros::lcd::set_text(1, "Autonomous Training Complete");
 			INFO("autonomous training complete");
 			pros::Task::delay(MSG_DELAY_MS);
