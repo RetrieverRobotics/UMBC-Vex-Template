@@ -189,7 +189,7 @@ namespace umbc {
              * controller recorder and playing back the controller inputs using the virtual
              * controller
              * 
-             * @param is_partner_controller - Set to true if partner controller input was
+             * @param is_partner_controller: Set to true if partner controller input was
              *      previously recorded and should be used
              */
             void autonomous(bool is_partner_controller);
@@ -205,7 +205,7 @@ namespace umbc {
              * Trains an autonomous routine for either skills or a tournament match through using opcontrol
              * and the controller recorder.
              * 
-             * @param is_partner_controller - Set to true if the partner controller should be recorded
+             * @param is_partner_controller: Set to true if the partner controller should be recorded
              */
             void train_autonomous(bool is_partner_controller);
 

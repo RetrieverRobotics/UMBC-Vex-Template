@@ -312,8 +312,9 @@ void umbc::Menu::robot_menu() {
                     current_sub_menu = umbc::Menu::SubMenu::ALLIANCE;
                 }
 
-                // end of sub-menus for skills matches
+                // skip alliance color selection and end of sub-menus for skills matches
                 else {
+                    this->robot->set_alliance_color(umbc::Robot::AllianceColor::NONE);
                     current_sub_menu = umbc::Menu::SubMenu::NONE;
                 }
                 break;
