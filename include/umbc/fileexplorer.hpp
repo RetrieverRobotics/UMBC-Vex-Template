@@ -1,8 +1,8 @@
 /**
  * @file umbc/fileexplorer.hpp
  *
- * Contains the prototype for the File Explorer class. The File Explorer Class is used for traversing through
- * a file system and providing files and directories at the current directory level.
+ * Contains the prototype for the File Explorer class. The File Explorer class is used for traversing through
+ * a file system and providing files at the current directory level.
  */
 
 #ifndef _FILE_EXPLORER_HPP_
@@ -26,9 +26,8 @@ using namespace std;
 namespace umbc {
 
     /**
-     * Provides a utility for navigating and managing a file system starting from a specified root directory.
-     * It maintains the current directory state and offers methods to inspect files and directories, as well
-     * as navigate through the file structure.
+     * Provides a utility for listing files and navigating a file system starting from a specified root
+     * directory. Child directories must be navigated by name because the PROS filesystem API cannot list them.
      */
     class FileExplorer {
 
@@ -37,11 +36,23 @@ namespace umbc {
             std::string root_dir = std::string();       // root directory of the FileExplorer's file system
             std::string current_dir = std::string();    // current directory the FileExplorer is in
 
-            // map of the current directory's children directories and their absolute paths
-            std::map<std::string, std::string> directories = std::map<std::string, std::string>();
-
             // map of the current directory's files and their absolute paths
             std::map<std::string, std::string> files = std::map<std::string, std::string>();
+
+            bool current_dir_valid = false;             // whether files were loaded from the current directory
+
+            /**
+             * @brief Loads the files at a directory into a map.
+             *
+             * @param directory_path: Path of the directory to load
+             * @param directory_files: Map to populate with file names and paths
+             *
+             * @return 0 on success. Otherwise the filesystem error number
+             */
+            std::int32_t load_files(
+                const std::string& directory_path,
+                std::map<std::string, std::string>& directory_files
+            );
 
 
         public:
@@ -104,7 +115,7 @@ namespace umbc {
             bool is_file(const std::string& file);
 
             /**
-             * @brief Determines if a directory is a child of the current directory and is a directory
+             * @brief Determines if a named child of the current directory is a directory
              * 
              * @param directory: Name of directory being evaluated
              * 
@@ -122,26 +133,20 @@ namespace umbc {
             std::list<string> get_files();
 
             /**
-             * @brief Returns all the children directories of the current directory
-             * 
-             * @return All children directories of the current directory. If there are no child directories
-             *      an empty list will be returned.
-             */
-            std::list<string> get_directories();
-
-            /**
-             * @brief Sets the current directory to the root directory
+             * @brief Sets the current directory to a named child directory
              * 
              * @param directory: Name of directory to set as the current directory
              * 
-             * @return OK on success. ERROR_INVALID_DIR if root directory does not exist
+             * @return OK on success, ERROR_INVALID_DIR if the directory does not exist, or ERROR
+             *      if the filesystem could not be read
              */
             umbc::FileExplorer::Result go_to_directory(const std::string& directory);
 
             /**
              * @brief Sets the current directory to the root directory
              * 
-             * @return OK on success. ERROR_INVALID_DIR if root directory does not exist
+             * @return OK on success, ERROR_INVALID_DIR if the root directory does not exist, or ERROR
+             *      if the filesystem could not be read
              */
             umbc::FileExplorer::Result go_to_root();
 
@@ -152,7 +157,8 @@ namespace umbc {
              * of the current directory. If the current directory is the root
              * directory, the current directory will remain the root directory.
              * 
-             * @return OK on sucess. ERROR_INVALID_DIR if parent directory does not exist
+             * @return OK on success, ERROR_INVALID_DIR if the parent directory does not exist, or ERROR
+             *      if the filesystem could not be read
              */
             umbc::FileExplorer::Result go_to_parent();
     };
