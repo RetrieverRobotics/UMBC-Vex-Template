@@ -86,9 +86,9 @@ namespace umbc {
             // delay in milliseconds when continuously polling controller input
             static constexpr std::uint32_t opcontrol_delay_ms = 10; 
 
-            umbc::Robot::MatchType match_type;  // current match type
+            umbc::Robot::MatchType match_type;          // current match type
             umbc::Robot::AllianceColor alliance_color;  // current alliance color
-            umbc::Robot::Mode mode;             // current mode
+            umbc::Robot::Mode mode;                     // current mode
 
             // physical version of master controller
             umbc::PController pcontroller_master = umbc::PController(E_CONTROLLER_MASTER);

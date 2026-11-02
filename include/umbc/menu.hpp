@@ -37,6 +37,7 @@ namespace umbc {
                 MATCH = 0,  // sub-menu for selecting match type
                 MODE = 1,   // sub-menu for selecting robot mode
                 ALLIANCE = 2,  // sub-menu for selecting alliance color
+                UTILITIES = 3, // sub-menu for accessing robot utilities
             };
 
             // delay for when continuously polling LCD buttons in milliseconds
@@ -64,6 +65,11 @@ namespace umbc {
              * @returns Robot mode that was selected. Otherwise umbc::RobotMode::NONE
              */
             umbc::Robot::Mode menu_mode();
+
+            /**
+             * @brief Menu to access robot utilities using the LLEMU
+             */
+            void menu_utilities();
 
 
         public:
