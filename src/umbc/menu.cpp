@@ -29,6 +29,7 @@ umbc::Robot::MatchType umbc::Menu::menu_match() {
     pros::lcd::set_text(1, "Select Match Type");
     pros::lcd::set_text(3, "1) Tournament");
     pros::lcd::set_text(4, "2) Skills");
+    pros::lcd::set_text(5, "3) Utilities");
 
     // continue polling LCD buttons until one is pressed
     INFO("waiting for match type selection...");
@@ -47,6 +48,12 @@ umbc::Robot::MatchType umbc::Menu::menu_match() {
         else if (LCD_BTN_CENTER == btn_press) {
             match_type = umbc::Robot::MatchType::SKILLS;
             INFO("skills selected for competition mode");
+        }
+        
+        // open the utilities sub-menu
+        else if (LCD_BTN_RIGHT == btn_press) {
+            match_type = umbc::Robot::MatchType::NONE;
+            INFO("utilities selected");
         }
         
         // no match type selected
@@ -186,6 +193,46 @@ umbc::Robot::Mode umbc::Menu::menu_mode() {
 }
 
 
+void umbc::Menu::menu_utilities() {
+
+    std::uint8_t btn_press = 0;
+
+    // display utilities sub-menu on the LCD
+    umbc::clear_lcd();
+    pros::lcd::set_text(1, "Utilities");
+    pros::lcd::set_text(3, "1) Back");
+
+    // continue polling LCD buttons until one is pressed
+    INFO("waiting for utility selection...");
+    while (0 == btn_press) {
+
+        // check if any LCD buttons have been pressed
+        btn_press = umbc::read_lcd_buttons();
+
+        // go back to the previous menu
+        if (LCD_BTN_LEFT == btn_press) {
+            INFO("back selected");
+        }
+
+        // no valid utility selected
+        else {
+            btn_press = 0;
+        }
+
+        // polling delay to not hog processor
+        pros::Task::delay(this->lcd_btn_polling_delay_ms);
+    }
+
+    // wait for the LCD button to be released
+    while (0 != umbc::read_lcd_buttons()) {
+        pros::Task::delay(this->lcd_btn_polling_delay_ms);
+    }
+
+    // clear the LCD
+    umbc::clear_lcd();
+}
+
+
 umbc::Menu::Menu(umbc::Robot* robot) {
     this->robot = robot;
 }
@@ -218,9 +265,9 @@ void umbc::Menu::robot_menu() {
                 umbc::Robot::MatchType match_type = this->menu_match();
                 this->robot->set_match_type(match_type);
 
-                // go back to match type sub-menu
+                // go to utilities sub-menu
                 if (umbc::Robot::MatchType::NONE == match_type) {
-                    current_sub_menu = umbc::Menu::SubMenu::MATCH;
+                    current_sub_menu = umbc::Menu::SubMenu::UTILITIES;
                     break;
                 }
 
@@ -269,6 +316,17 @@ void umbc::Menu::robot_menu() {
                 else {
                     current_sub_menu = umbc::Menu::SubMenu::NONE;
                 }
+                break;
+            }
+
+            // utilities sub-menu
+            case umbc::Menu::SubMenu::UTILITIES: {
+
+                // display robot utilities
+                this->menu_utilities();
+
+                // go back to match type sub-menu
+                current_sub_menu = umbc::Menu::SubMenu::MATCH;
                 break;
             }
             
