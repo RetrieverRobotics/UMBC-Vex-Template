@@ -10,6 +10,7 @@
 
 // standard libraries
 #include <cstdint>
+#include <string>
 
 // local header files
 #include "api.h"
@@ -38,10 +39,33 @@ namespace umbc {
                 MODE = 1,   // sub-menu for selecting robot mode
                 ALLIANCE = 2,  // sub-menu for selecting alliance color
                 UTILITIES = 3, // sub-menu for accessing robot utilities
+                AUTONOMOUS_CATEGORY = 4,  // sub-menu for selecting the autonomous selection category
+                AUTONOMOUS_TYPE = 5,      // sub-menu for selecting the autonomous type
+                AUTONOMOUS_RECORDING = 6  // sub-menu for selecting an autonomous recording
+            };
+
+            /**
+             * Utility identifiers
+             */
+            enum class Utility : std::int32_t {
+                NONE = -1,              // no utility
+                SELECT_AUTONOMOUS = 0   // utility for selecting autonomous routines
             };
 
             // delay for when continuously polling LCD buttons in milliseconds
             static constexpr std::uint32_t lcd_btn_polling_delay_ms = 10;
+
+            // number of recordings displayed per page on the recording sub-menu
+            static constexpr std::uint32_t recordings_per_page = 3;
+
+            // maximum number of characters of a recording name to display
+            static constexpr std::uint32_t recording_display_length_max = 35;
+
+            // suffix appended to recording names truncated for display
+            static constexpr char* recording_truncation_suffix = (char*)"...";
+
+            // LCD line of the first recording displayed on the recording sub-menu
+            static constexpr std::uint32_t recording_list_first_line = 3;
         
             umbc::Robot* robot = nullptr;   // reference to robot being configured by the menu
 
@@ -68,8 +92,39 @@ namespace umbc {
 
             /**
              * @brief Menu to access robot utilities using the LLEMU
+             * 
+             * @returns Utility that was selected. Otherwise umbc::Menu::Utility::NONE
              */
-            void menu_utilities();
+            umbc::Menu::Utility menu_utilities();
+
+            /**
+             * @brief Menu to select the autonomous selection category using the LLEMU
+             * 
+             * @returns Match type of the category that was selected. Otherwise
+             *      umbc::Robot::MatchType::NONE
+             */
+            umbc::Robot::MatchType menu_autonomous_category();
+
+            /**
+             * @brief Menu to select the autonomous type using the LLEMU
+             * 
+             * @param category: Match type of the category being selected for
+             * 
+             * @returns Autonomous type that was selected. Otherwise
+             *      umbc::Robot::AutonomousType::NONE
+             */
+            umbc::Robot::AutonomousType menu_autonomous_type(umbc::Robot::MatchType category);
+
+            /**
+             * @brief Menu to select an autonomous recording using the LLEMU
+             * 
+             * Lists the autonomous recordings found at the root of the SD card
+             * for selection.
+             * 
+             * @returns Name of the recording that was selected. Otherwise an
+             *      empty string
+             */
+            std::string menu_autonomous_recording();
 
 
         public:
