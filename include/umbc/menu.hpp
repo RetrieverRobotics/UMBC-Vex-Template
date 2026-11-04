@@ -57,6 +57,15 @@ namespace umbc {
 
             // number of recordings displayed per page on the recording sub-menu
             static constexpr std::uint32_t recordings_per_page = 3;
+
+            // maximum number of characters of a recording name to display
+            static constexpr std::uint32_t recording_display_length_max = 35;
+
+            // suffix appended to recording names truncated for display
+            static constexpr char* recording_truncation_suffix = (char*)"...";
+
+            // LCD line of the first recording displayed on the recording sub-menu
+            static constexpr std::uint32_t recording_list_first_line = 3;
         
             umbc::Robot* robot = nullptr;   // reference to robot being configured by the menu
 

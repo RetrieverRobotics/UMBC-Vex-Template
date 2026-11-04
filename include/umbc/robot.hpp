@@ -73,6 +73,10 @@ namespace umbc {
             // directory where autonomous recordings are stored
             static constexpr char* autonomous_directory = (char*)"/usd";
 
+            // directory for listing autonomous recordings
+            // (usd_list_files paths must not be prepended with /usd)
+            static constexpr char* autonomous_list_directory = (char*)"/";
+
             // file extension for autonomous recordings
             static constexpr char* autonomous_file_extension = (char*)".auto";
 

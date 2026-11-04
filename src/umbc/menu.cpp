@@ -395,7 +395,7 @@ std::string umbc::Menu::menu_autonomous_recording() {
     }
 
     // gather the recordings at the root of the SD card
-    FileExplorer file_explorer = FileExplorer(umbc::Robot::autonomous_directory);
+    FileExplorer file_explorer = FileExplorer(umbc::Robot::autonomous_list_directory);
     std::vector<std::string> recordings;
     for (const std::string& file : file_explorer.get_files()) {
 
@@ -451,8 +451,17 @@ std::string umbc::Menu::menu_autonomous_recording() {
         std::size_t page_start = (cursor / this->recordings_per_page) * this->recordings_per_page;
         for (std::size_t i = 0;
             i < this->recordings_per_page && page_start + i < recordings.size(); i++) {
-            std::string line = ((page_start + i == cursor) ? "> " : "  ") + recordings[page_start + i];
-            pros::lcd::set_text(3 + i, line);
+
+            // truncate recording names too long to display with an ellipsis
+            std::string name = recordings[page_start + i];
+            std::string truncation_suffix = std::string(this->recording_truncation_suffix);
+            if (this->recording_display_length_max < name.size()) {
+                name = name.substr(0, this->recording_display_length_max - truncation_suffix.size())
+                    + truncation_suffix;
+            }
+
+            std::string line = ((page_start + i == cursor) ? "> " : "  ") + name;
+            pros::lcd::set_text(this->recording_list_first_line + i, line);
         }
         pros::lcd::set_text(7, "1) Next 2) Select 3) Back");
 

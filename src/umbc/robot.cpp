@@ -427,7 +427,7 @@ void umbc::Robot::autonomous_recorded(const std::string& recording_name, bool is
     std::string file_path_partner = this->autonomous_file_path(recording_name, true);
 
     // check that the recording exists
-    FileExplorer file_explorer = FileExplorer(this->autonomous_directory);
+    FileExplorer file_explorer = FileExplorer(this->autonomous_list_directory);
     if (false == file_explorer.is_file(recording_name + this->autonomous_file_extension)) {
         ERROR("cannot play back recorded autonomous; " + file_path_master + " does not exist");
         pros::lcd::set_text(3, "Recording Not Found");
