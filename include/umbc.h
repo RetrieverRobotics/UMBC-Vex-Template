@@ -16,6 +16,7 @@
 #include "umbc/controllerinput.hpp"
 #include "umbc/controllerrecorder.hpp"
 #include "umbc/fileexplorer.hpp"
+#include "umbc/json.hpp"
 #include "umbc/pcontroller.hpp"
 #include "umbc/robot.hpp"
 #include "umbc/vcontroller.hpp"

@@ -16,6 +16,7 @@
 
 #include <cstdint>
 #include <queue>
+#include <string>
 
 using namespace pros;
 using namespace std;
@@ -59,23 +60,60 @@ namespace umbc {
                 TRAIN_AUTONOMOUS = 1    // train autonomous mode
             };
 
+
+            /**
+             * Autonomous routine types
+             */
+            enum class AutonomousType : std::int32_t {
+                NONE = -1,      // invalid autonomous type
+                RECORDED = 0,   // recorded autonomous routine played back from a file
+                PROGRAMMED = 1  // user-programmed autonomous routine
+            };
+
+            // directory where autonomous recordings are stored
+            static constexpr char* autonomous_directory = (char*)"/usd";
+
+            // file extension for autonomous recordings
+            static constexpr char* autonomous_file_extension = (char*)".auto";
+
+            // suffix appended to a recording name for the partner controller recording
+            static constexpr char* autonomous_partner_suffix = (char*)"-partner";
+
         
         private:
 
             // name of task that converts controller input into robot actions
             static constexpr char* t_opcontrol_name =  (char*)"robot_opcontrol";
 
-            // file path for loading master virtual controller input for a practice, qualification and elimination match
-            static constexpr char* match_autonomous_file_master = (char*)"/usd/autonomous_tournament.bin";
+            // default recording name for a practice, qualification and elimination match
+            static constexpr char* default_tournament_autonomous_name = (char*)"autonomous_tournament";
 
-            // file path for loading partner virtual controller input for a practice, qualification and elimination match
-            static constexpr char* match_autonomous_file_partner = (char*)"/usd/autonomous_tournament-partner.bin";
+            // default recording name for a skills match
+            static constexpr char* default_skills_autonomous_name = (char*)"autonomous_skills";
 
-            // file path for loading master virtual controller input for a skills match
-            static constexpr char* skills_autonomous_file_master = (char*)"/usd/autonomous_skills.bin";
+            // file path for loading and saving the robot configuration
+            static constexpr char* config_file_path = (char*)"/usd/config.json";
 
-            // file path for loading partner virtual controller input for a skills match
-            static constexpr char* skills_autonomous_file_partner = (char*)"/usd/autonomous_skills-partner.bin";
+            // name of the autonomous object in the configuration file
+            static constexpr char* config_name_autonomous = (char*)"autonomous";
+
+            // name of the competition selection object in the configuration file
+            static constexpr char* config_name_competition = (char*)"competition";
+
+            // name of the skills selection object in the configuration file
+            static constexpr char* config_name_skills = (char*)"skills";
+
+            // name of the autonomous type value in the configuration file
+            static constexpr char* config_name_type = (char*)"type";
+
+            // name of the recording file value in the configuration file
+            static constexpr char* config_name_file = (char*)"file";
+
+            // autonomous type value for recorded routines in the configuration file
+            static constexpr char* config_type_recorded = (char*)"recorded";
+
+            // autonomous type value for programmed routines in the configuration file
+            static constexpr char* config_type_programmed = (char*)"programmed";
 
             // amount of time in milliseconds for a practice, qualification and elimination match
             static constexpr std::uint32_t tournament_autonomous_time_ms = 30000;
@@ -89,6 +127,18 @@ namespace umbc {
             umbc::Robot::MatchType match_type;          // current match type
             umbc::Robot::AllianceColor alliance_color;  // current alliance color
             umbc::Robot::Mode mode;                     // current mode
+
+            // autonomous type selected for a tournament match
+            umbc::Robot::AutonomousType competition_autonomous_type;
+
+            // recording name selected for a tournament match
+            std::string competition_autonomous_name;
+
+            // autonomous type selected for a skills match
+            umbc::Robot::AutonomousType skills_autonomous_type;
+
+            // recording name selected for a skills match
+            std::string skills_autonomous_name;
 
             // physical version of master controller
             umbc::PController pcontroller_master = umbc::PController(E_CONTROLLER_MASTER);
@@ -115,6 +165,29 @@ namespace umbc {
              */
             static void robot_opcontrol(Robot* robot);
 
+            /**
+             * @brief Builds the file path for an autonomous recording
+             * 
+             * @param recording_name: Name of the recording
+             * @param is_partner_controller: Set to true to build the path for the
+             *      partner controller recording
+             * 
+             * @return File path of the autonomous recording
+             */
+            std::string autonomous_file_path(const std::string& recording_name, bool is_partner_controller);
+
+            /**
+             * @brief Performs robot actions by playing back a recorded routine
+             * 
+             * Plays back a recorded routine that was created by training the robot using the
+             * controller recorder through the virtual controllers
+             * 
+             * @param recording_name: Name of the recording to play back
+             * @param is_partner_controller: Set to true if partner controller input was
+             *      previously recorded and should be used
+             */
+            void autonomous_recorded(const std::string& recording_name, bool is_partner_controller);
+
 
         public:
         
@@ -122,6 +195,17 @@ namespace umbc {
              * @brief Creates a robot object
              */
             Robot();
+
+            /**
+             * @brief Performs user program initialization
+             * 
+             * Performs user implemented program initialization, such as initializing
+             * sensors, motors and subsystems. Intended to be called once at program
+             * startup before competition or driver control execution.
+             * 
+             * @note Implemented by the user in initialize.cpp
+             */
+            void initialize();
 
             /**
              * @brief Sets controllers to use physical controllers
@@ -183,16 +267,86 @@ namespace umbc {
             void set_mode(umbc::Robot::Mode mode);
 
             /**
-             * @brief Performs robot actions via a preset routine
+             * @brief Retrieve the selected autonomous type for a match type
              * 
-             * Performs a preset routine that was created by training the robot using the
-             * controller recorder and playing back the controller inputs using the virtual
-             * controller
+             * @param match_type: Match type of the selection
+             * 
+             * @return Selected autonomous type for the match type. Otherwise
+             *      umbc::Robot::AutonomousType::NONE for an invalid match type
+            */
+            umbc::Robot::AutonomousType get_autonomous_type(umbc::Robot::MatchType match_type);
+
+            /**
+             * @brief Retrieve the selected recording name for a match type
+             * 
+             * @param match_type: Match type of the selection
+             * 
+             * @return Selected recording name for the match type. Otherwise an
+             *      empty string for an invalid match type
+            */
+            std::string get_autonomous_name(umbc::Robot::MatchType match_type);
+
+            /**
+             * @brief Set the autonomous selection for a match type and save it to the configuration file
+             * 
+             * Sets the autonomous selection for a match type, replacing the previous
+             * selection, and saves all selections to the configuration file so they
+             * persist between robot restarts.
+             * 
+             * @param match_type: Match type of the selection
+             * @param autonomous_type: Autonomous type to select
+             * @param recording_name: Name of the recording to select. Ignored for
+             *      programmed autonomous routines
+            */
+            void set_autonomous(umbc::Robot::MatchType match_type,
+                umbc::Robot::AutonomousType autonomous_type, const std::string& recording_name);
+
+            /**
+             * @brief Loads the autonomous selections from the configuration file
+             * 
+             * Loads the autonomous selections from the configuration file on the SD card.
+             * The current selections are kept for any selection that is missing or invalid.
+             * 
+             * @return 1 if the configuration file was read successfully. Otherwise 0
+            */
+            std::int32_t load_autonomous_selections();
+
+            /**
+             * @brief Saves the autonomous selections to the configuration file
+             * 
+             * Saves the autonomous selections to the configuration file on the SD card.
+             * Unrelated values in the configuration file are preserved.
+             * 
+             * @return 1 if the configuration file was saved successfully. Otherwise 0
+            */
+            std::int32_t save_autonomous_selections();
+
+            /**
+             * @brief Performs robot actions for the selected autonomous routine
+             * 
+             * Performs the autonomous routine selected for the current match type.
+             * Recorded routines are played back from their recording using the
+             * virtual controllers, while programmed routines run the user
+             * implemented autonomous code.
              * 
              * @param is_partner_controller: Set to true if partner controller input was
-             *      previously recorded and should be used
+             *      previously recorded and should be used for a recorded routine
              */
             void autonomous(bool is_partner_controller);
+
+            /**
+             * @brief Performs the user-programmed autonomous routine for a tournament match
+             * 
+             * @note Implemented by the user in autonomous.cpp
+             */
+            void autonomous_competition();
+
+            /**
+             * @brief Performs the user-programmed autonomous routine for a skills match
+             * 
+             * @note Implemented by the user in autonomous.cpp
+             */
+            void autonomous_skills();
 
             /**
              * @brief Allows operator to manually control the robot via a controller

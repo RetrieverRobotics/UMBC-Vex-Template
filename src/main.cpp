@@ -39,6 +39,12 @@ void initialize() {
 	pros::lcd::initialize();
 	robot.update_lcd_colors();
 
+	// load autonomous selections from the configuration file
+	robot.load_autonomous_selections();
+
+	// perform user program initialization
+	robot.initialize();
+
 	INFO("robot initialized");
 }
 
@@ -108,7 +114,7 @@ void autonomous() {
 
 	INFO("performing autonomous routine...");
 
-	// perform trained autonomous routine
+	// perform selected autonomous routine
 	umbc::clear_lcd();
 	pros::lcd::set_text(1, "Autonomous Active");
 	robot.autonomous(PARTNER_CONTROLLER);
