@@ -45,6 +45,9 @@ void initialize() {
 	// load match times from the configuration file
 	robot.load_match_times();
 
+	// warn about autonomous directories missing on the SD card
+	robot.check_autonomous_directories();
+
 	// perform user program initialization
 	robot.initialize();
 
@@ -171,6 +174,17 @@ void opcontrol() {
 				pros::lcd::set_text(1, "No SD Card Detected!");
 				pros::lcd::set_text(3, "Power off V5 Brain and insert");
 				pros::lcd::set_text(4, "SD Card.");
+				return;
+			}
+
+			// check that the autonomous directory for the match type exists
+			if (false == umbc::Robot::has_autonomous_directory(robot.get_match_type())) {
+				std::string directory = umbc::Robot::get_autonomous_list_directory(robot.get_match_type());
+				ERROR("autonomous training failed; " + directory + " is missing on the SD card");
+				umbc::LCD::clear();
+				pros::lcd::set_text(1, "Missing Autonomous Folder!");
+				pros::lcd::set_text(3, "Create " + directory);
+				pros::lcd::set_text(4, "on SD Card.");
 				return;
 			}
 

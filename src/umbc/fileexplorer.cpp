@@ -5,6 +5,7 @@
  */
 
 // standard libraries
+#include <algorithm>
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
@@ -251,7 +252,7 @@ std::int32_t umbc::FileExplorer::load_files(
 
     while (this->maximum_buffer_size >= buffer_size) {
 
-        buffer.assign(buffer_size, '\x7f');
+        buffer.assign(buffer_size, this->buffer_fill_character);
         errno = 0;
 
         if (1 != pros::usd::list_files(directory_path.c_str(), buffer.data(), static_cast<std::int32_t>(buffer.size()))) {
@@ -267,6 +268,13 @@ std::int32_t umbc::FileExplorer::load_files(
         }
 
         char* terminator = static_cast<char*>(std::memchr(buffer.data(), '\0', buffer.size()));
+
+        // the firmware leaves the buffer untouched when a directory contains no files
+        if (nullptr == terminator
+            && buffer.size() == static_cast<std::size_t>(std::count(buffer.begin(), buffer.end(), this->buffer_fill_character))) {
+            directory_files.clear();
+            return 0;
+        }
 
         if (nullptr == terminator) {
             if (buffer_size == this->maximum_buffer_size) {

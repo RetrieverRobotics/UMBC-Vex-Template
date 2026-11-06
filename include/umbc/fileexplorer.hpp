@@ -39,6 +39,9 @@ namespace umbc {
             // maximum size in bytes of the buffer used to list files
             static constexpr std::size_t maximum_buffer_size = 32768;
 
+            // character the buffer used to list files is filled with to detect unwritten bytes
+            static constexpr char buffer_fill_character = '\x7f';
+
             std::string root_dir = std::string();       // root directory of the FileExplorer's file system
             std::string current_dir = std::string();    // current directory the FileExplorer is in
 

@@ -203,18 +203,18 @@ namespace umbc {
              * @param config: Json object to populate with the configuration. Reset to
              *      a JSON null value if the configuration file could not be read
              * 
-             * @return 1 if the configuration file was read successfully. Otherwise 0
+             * @return True if the configuration file was read successfully. Otherwise false
              */
-            std::int32_t read_config_file(Json& config);
+            bool read_config_file(Json& config);
 
             /**
              * @brief Writes the configuration to the configuration file
              * 
              * @param config: Configuration to write
              * 
-             * @return 1 if the configuration file was written successfully. Otherwise 0
+             * @return True if the configuration file was written successfully. Otherwise false
              */
-            std::int32_t write_config_file(const Json& config);
+            bool write_config_file(const Json& config);
 
             /**
              * @brief Checks if a match time is valid
@@ -371,6 +371,25 @@ namespace umbc {
             static std::string get_autonomous_list_directory(umbc::Robot::MatchType match_type);
 
             /**
+             * @brief Checks if the directory autonomous recordings are stored in exists for a match type
+             * 
+             * @param match_type: Match type of the recordings
+             * 
+             * @return True if the directory exists on the SD card. Otherwise false
+             * 
+             * @note Directories cannot be created by the robot because PROS does not
+             *      implement mkdir, so they must be created on the SD card from a computer.
+            */
+            static bool has_autonomous_directory(umbc::Robot::MatchType match_type);
+
+            /**
+             * @brief Logs a warning for each match type missing its autonomous directory
+             * 
+             * @return True if the autonomous directories exist for all match types. Otherwise false
+            */
+            bool check_autonomous_directories();
+
+            /**
              * @brief Set the autonomous selection for a match type and save it to the configuration file
              * 
              * Sets the autonomous selection for a match type, replacing the previous
@@ -391,9 +410,9 @@ namespace umbc {
              * Loads the autonomous selections from the configuration file on the SD card.
              * The current selections are kept for any selection that is missing or invalid.
              * 
-             * @return 1 if the configuration file was read successfully. Otherwise 0
+             * @return True if the configuration file was read successfully. Otherwise false
             */
-            std::int32_t load_autonomous_selections();
+            bool load_autonomous_selections();
 
             /**
              * @brief Saves the autonomous selections to the configuration file
@@ -401,9 +420,9 @@ namespace umbc {
              * Saves the autonomous selections to the configuration file on the SD card.
              * Unrelated values in the configuration file are preserved.
              * 
-             * @return 1 if the configuration file was saved successfully. Otherwise 0
+             * @return True if the configuration file was saved successfully. Otherwise false
             */
-            std::int32_t save_autonomous_selections();
+            bool save_autonomous_selections();
 
             /**
              * @brief Retrieve the match time for a match type
@@ -434,9 +453,9 @@ namespace umbc {
              * Loads the match times from the configuration file on the SD card.
              * The default match time is used for any match time that is missing or invalid.
              * 
-             * @return 1 if the configuration file was read successfully. Otherwise 0
+             * @return True if the configuration file was read successfully. Otherwise false
             */
-            std::int32_t load_match_times();
+            bool load_match_times();
 
             /**
              * @brief Saves the match times to the configuration file
@@ -444,9 +463,9 @@ namespace umbc {
              * Saves the match times to the configuration file on the SD card.
              * Unrelated values in the configuration file are preserved.
              * 
-             * @return 1 if the configuration file was saved successfully. Otherwise 0
+             * @return True if the configuration file was saved successfully. Otherwise false
             */
-            std::int32_t save_match_times();
+            bool save_match_times();
 
             /**
              * @brief Performs robot actions for the selected autonomous routine
