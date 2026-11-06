@@ -670,6 +670,14 @@ void umbc::Menu::robot_menu() {
         return;
     }
 
+    if (false == this->robot->stop_outputs()) {
+        ERROR("cannot display robot menu; could not stop all motors");
+        umbc::LCD::clear();
+        pros::lcd::set_text(1, "Motor Stop Failed!");
+        pros::lcd::set_text(3, "Do not approach the robot.");
+        return;
+    }
+
     // clear the LCD
     umbc::LCD::clear();
 
@@ -800,12 +808,12 @@ void umbc::Menu::robot_menu() {
                 }
 
                 // save the programmed selection for the category
-                this->robot->set_autonomous(autonomous_category,
+                bool selection_saved = this->robot->set_autonomous(autonomous_category,
                     umbc::Robot::AutonomousType::PROGRAMMED, std::string());
 
-                // display the selection has been saved on the LCD
+                // display the selection save result on the LCD
                 umbc::LCD::clear();
-                pros::lcd::set_text(1, "Selection Saved");
+                pros::lcd::set_text(1, selection_saved ? "Selection Saved" : "Selection Save Failed");
                 pros::Task::delay(MSG_DELAY_MS);
                 umbc::LCD::clear();
 
@@ -827,12 +835,12 @@ void umbc::Menu::robot_menu() {
                 }
 
                 // save the recorded selection for the category
-                this->robot->set_autonomous(autonomous_category,
+                bool selection_saved = this->robot->set_autonomous(autonomous_category,
                     umbc::Robot::AutonomousType::RECORDED, recording_name);
 
-                // display the selection has been saved on the LCD
+                // display the selection save result on the LCD
                 umbc::LCD::clear();
-                pros::lcd::set_text(1, "Selection Saved");
+                pros::lcd::set_text(1, selection_saved ? "Selection Saved" : "Selection Save Failed");
                 pros::Task::delay(MSG_DELAY_MS);
                 umbc::LCD::clear();
 
