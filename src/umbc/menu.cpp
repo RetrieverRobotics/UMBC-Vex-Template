@@ -26,7 +26,7 @@ umbc::Robot::MatchType umbc::Menu::menu_match() {
     std::uint8_t btn_press = 0;
 
     // display match type menu on the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
     pros::lcd::set_text(1, "Select Match Type");
     pros::lcd::set_text(3, "1) Tournament");
     pros::lcd::set_text(4, "2) Skills");
@@ -37,7 +37,7 @@ umbc::Robot::MatchType umbc::Menu::menu_match() {
     while (0 == btn_press) {
 
         // check if any LCD buttons have been pressed
-        btn_press = umbc::read_lcd_buttons();
+        btn_press = umbc::LCD::read_buttons();
         
         // set robot's match type to tournament
         if (LCD_BTN_LEFT == btn_press) {
@@ -67,12 +67,12 @@ umbc::Robot::MatchType umbc::Menu::menu_match() {
     }
 
     // wait for the LCD button to be released
-    while (0 != umbc::read_lcd_buttons()) {
+    while (0 != umbc::LCD::read_buttons()) {
         pros::Task::delay(this->lcd_btn_polling_delay_ms);
     }
 
     // clear the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
 
     return match_type;
 }
@@ -84,7 +84,7 @@ umbc::Robot::AllianceColor umbc::Menu::menu_alliance() {
     std::uint8_t btn_press = 0;
 
     // display alliance color sub-menu on the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
     pros::lcd::set_text(1, "Select Alliance Color");
     pros::lcd::set_text(3, "1) Red");
     pros::lcd::set_text(4, "2) Blue");
@@ -95,7 +95,7 @@ umbc::Robot::AllianceColor umbc::Menu::menu_alliance() {
     while (0 == btn_press) {
 
         // check if any LCD buttons have been pressed
-        btn_press = umbc::read_lcd_buttons();
+        btn_press = umbc::LCD::read_buttons();
 
         // red alliance selected
         if (LCD_BTN_LEFT == btn_press) {
@@ -125,12 +125,12 @@ umbc::Robot::AllianceColor umbc::Menu::menu_alliance() {
     }
 
     // wait for the LCD button to be released
-    while (0 != umbc::read_lcd_buttons()) {
+    while (0 != umbc::LCD::read_buttons()) {
         pros::Task::delay(this->lcd_btn_polling_delay_ms);
     }
 
     // clear the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
 
     return alliance_color;
 }
@@ -142,7 +142,7 @@ umbc::Robot::Mode umbc::Menu::menu_mode() {
     std::uint8_t btn_press = 0;
 
     // display robot mode sub-menu on the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
     pros::lcd::set_text(1, "Select Mode");
     pros::lcd::set_text(3, "1) Competition");
     pros::lcd::set_text(4, "2) Train Autonomous");
@@ -153,7 +153,7 @@ umbc::Robot::Mode umbc::Menu::menu_mode() {
     while (0 == btn_press) {
 
         // check if any LCD buttons have been pressed
-        btn_press = umbc::read_lcd_buttons();
+        btn_press = umbc::LCD::read_buttons();
         
         // competition robot mode selected
         if (LCD_BTN_LEFT == btn_press) {
@@ -183,12 +183,12 @@ umbc::Robot::Mode umbc::Menu::menu_mode() {
     }
 
     // wait for the LCD button to be released
-    while (0 != umbc::read_lcd_buttons()) {
+    while (0 != umbc::LCD::read_buttons()) {
         pros::Task::delay(this->lcd_btn_polling_delay_ms);
     }
 
     // clear the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
 
     return mode;
 }
@@ -200,17 +200,18 @@ umbc::Menu::Utility umbc::Menu::menu_utilities() {
     std::uint8_t btn_press = 0;
 
     // display utilities sub-menu on the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
     pros::lcd::set_text(1, "Utilities");
     pros::lcd::set_text(3, "1) Select Autonomous");
-    pros::lcd::set_text(4, "2) Back");
+    pros::lcd::set_text(4, "2) Set Match Time");
+    pros::lcd::set_text(5, "3) Back");
 
     // continue polling LCD buttons until one is pressed
     INFO("waiting for utility selection...");
     while (0 == btn_press) {
 
         // check if any LCD buttons have been pressed
-        btn_press = umbc::read_lcd_buttons();
+        btn_press = umbc::LCD::read_buttons();
 
         // select autonomous utility selected
         if (LCD_BTN_LEFT == btn_press) {
@@ -218,8 +219,14 @@ umbc::Menu::Utility umbc::Menu::menu_utilities() {
             INFO("select autonomous selected for utility");
         }
 
-        // go back to the previous menu
+        // match time utility selected
         else if (LCD_BTN_CENTER == btn_press) {
+            utility = umbc::Menu::Utility::SET_MATCH_TIME;
+            INFO("match time selected for utility");
+        }
+
+        // go back to the previous menu
+        else if (LCD_BTN_RIGHT == btn_press) {
             utility = umbc::Menu::Utility::NONE;
             INFO("back selected");
         }
@@ -234,12 +241,12 @@ umbc::Menu::Utility umbc::Menu::menu_utilities() {
     }
 
     // wait for the LCD button to be released
-    while (0 != umbc::read_lcd_buttons()) {
+    while (0 != umbc::LCD::read_buttons()) {
         pros::Task::delay(this->lcd_btn_polling_delay_ms);
     }
 
     // clear the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
 
     return utility;
 }
@@ -251,7 +258,7 @@ umbc::Robot::MatchType umbc::Menu::menu_autonomous_category() {
     std::uint8_t btn_press = 0;
 
     // display autonomous category sub-menu on the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
     pros::lcd::set_text(1, "Select Autonomous");
     pros::lcd::set_text(3, "1) Competition");
     pros::lcd::set_text(4, "2) Skills");
@@ -262,7 +269,7 @@ umbc::Robot::MatchType umbc::Menu::menu_autonomous_category() {
     while (0 == btn_press) {
 
         // check if any LCD buttons have been pressed
-        btn_press = umbc::read_lcd_buttons();
+        btn_press = umbc::LCD::read_buttons();
 
         // competition category selected
         if (LCD_BTN_LEFT == btn_press) {
@@ -292,12 +299,12 @@ umbc::Robot::MatchType umbc::Menu::menu_autonomous_category() {
     }
 
     // wait for the LCD button to be released
-    while (0 != umbc::read_lcd_buttons()) {
+    while (0 != umbc::LCD::read_buttons()) {
         pros::Task::delay(this->lcd_btn_polling_delay_ms);
     }
 
     // clear the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
 
     return category;
 }
@@ -313,7 +320,7 @@ umbc::Robot::AutonomousType umbc::Menu::menu_autonomous_type(umbc::Robot::MatchT
         ? "Select Skills Type" : "Select Competition Type";
 
     // display autonomous type sub-menu on the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
     pros::lcd::set_text(1, title);
     pros::lcd::set_text(3, "1) Recorded");
     pros::lcd::set_text(4, "2) Programmed");
@@ -324,7 +331,7 @@ umbc::Robot::AutonomousType umbc::Menu::menu_autonomous_type(umbc::Robot::MatchT
     while (0 == btn_press) {
 
         // check if any LCD buttons have been pressed
-        btn_press = umbc::read_lcd_buttons();
+        btn_press = umbc::LCD::read_buttons();
 
         // recorded autonomous type selected
         if (LCD_BTN_LEFT == btn_press) {
@@ -354,18 +361,18 @@ umbc::Robot::AutonomousType umbc::Menu::menu_autonomous_type(umbc::Robot::MatchT
     }
 
     // wait for the LCD button to be released
-    while (0 != umbc::read_lcd_buttons()) {
+    while (0 != umbc::LCD::read_buttons()) {
         pros::Task::delay(this->lcd_btn_polling_delay_ms);
     }
 
     // clear the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
 
     return autonomous_type;
 }
 
 
-std::string umbc::Menu::menu_autonomous_recording() {
+std::string umbc::Menu::menu_autonomous_recording(umbc::Robot::MatchType category) {
 
     std::string recording_name = std::string();
     std::string file_extension = std::string(umbc::Robot::autonomous_file_extension);
@@ -374,28 +381,28 @@ std::string umbc::Menu::menu_autonomous_recording() {
     // check that an SD card is installed
     if (0 == pros::usd::is_installed()) {
         ERROR("cannot list autonomous recordings; no SD Card detected");
-        umbc::clear_lcd();
+        umbc::LCD::clear();
         pros::lcd::set_text(1, "No SD Card Detected");
         pros::lcd::set_text(3, "1) Back");
 
         // wait for the back button to be pressed
-        while (LCD_BTN_LEFT != umbc::read_lcd_buttons()) {
+        while (LCD_BTN_LEFT != umbc::LCD::read_buttons()) {
             pros::Task::delay(this->lcd_btn_polling_delay_ms);
         }
 
         // wait for the LCD button to be released
-        while (0 != umbc::read_lcd_buttons()) {
+        while (0 != umbc::LCD::read_buttons()) {
             pros::Task::delay(this->lcd_btn_polling_delay_ms);
         }
 
         // clear the LCD
-        umbc::clear_lcd();
+        umbc::LCD::clear();
 
         return recording_name;
     }
 
-    // gather the recordings at the root of the SD card
-    FileExplorer file_explorer = FileExplorer(umbc::Robot::autonomous_list_directory);
+    // gather the recordings in the category's autonomous directory
+    FileExplorer file_explorer = FileExplorer(umbc::Robot::get_autonomous_list_directory(category));
     std::vector<std::string> recordings;
     for (const std::string& file : file_explorer.get_files()) {
 
@@ -417,23 +424,23 @@ std::string umbc::Menu::menu_autonomous_recording() {
 
     // display message when no recordings exist
     if (recordings.empty()) {
-        WARN("no autonomous recordings found at " + string(umbc::Robot::autonomous_directory));
-        umbc::clear_lcd();
+        WARN("no autonomous recordings found at " + umbc::Robot::get_autonomous_directory(category));
+        umbc::LCD::clear();
         pros::lcd::set_text(1, "No Recordings Found");
         pros::lcd::set_text(3, "1) Back");
 
         // wait for the back button to be pressed
-        while (LCD_BTN_LEFT != umbc::read_lcd_buttons()) {
+        while (LCD_BTN_LEFT != umbc::LCD::read_buttons()) {
             pros::Task::delay(this->lcd_btn_polling_delay_ms);
         }
 
         // wait for the LCD button to be released
-        while (0 != umbc::read_lcd_buttons()) {
+        while (0 != umbc::LCD::read_buttons()) {
             pros::Task::delay(this->lcd_btn_polling_delay_ms);
         }
 
         // clear the LCD
-        umbc::clear_lcd();
+        umbc::LCD::clear();
 
         return recording_name;
     }
@@ -446,7 +453,7 @@ std::string umbc::Menu::menu_autonomous_recording() {
     while (false == selection_made) {
 
         // display the page of recordings the cursor is on
-        umbc::clear_lcd();
+        umbc::LCD::clear();
         pros::lcd::set_text(1, "Select Recording");
         std::size_t page_start = (cursor / this->recordings_per_page) * this->recordings_per_page;
         for (std::size_t i = 0;
@@ -463,14 +470,14 @@ std::string umbc::Menu::menu_autonomous_recording() {
             std::string line = ((page_start + i == cursor) ? "> " : "  ") + name;
             pros::lcd::set_text(this->recording_list_first_line + i, line);
         }
-        pros::lcd::set_text(7, "1) Next 2) Select 3) Back");
+        pros::lcd::set_text(this->options_line, "1) Next 2) Select 3) Back");
 
         // continue polling LCD buttons until one is pressed
         std::uint8_t btn_press = 0;
         while (0 == btn_press) {
 
             // check if any LCD buttons have been pressed
-            btn_press = umbc::read_lcd_buttons();
+            btn_press = umbc::LCD::read_buttons();
 
             // move the cursor to the next recording
             if (LCD_BTN_LEFT == btn_press) {
@@ -500,15 +507,144 @@ std::string umbc::Menu::menu_autonomous_recording() {
         }
 
         // wait for the LCD button to be released
-        while (0 != umbc::read_lcd_buttons()) {
+        while (0 != umbc::LCD::read_buttons()) {
             pros::Task::delay(this->lcd_btn_polling_delay_ms);
         }
     }
 
     // clear the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
 
     return recording_name;
+}
+
+
+umbc::Robot::MatchType umbc::Menu::menu_match_time_category() {
+
+    umbc::Robot::MatchType category = umbc::Robot::MatchType::NONE;
+    std::uint8_t btn_press = 0;
+
+    // display match time category sub-menu on the LCD
+    umbc::LCD::clear();
+    pros::lcd::set_text(1, "Select Match Time");
+    pros::lcd::set_text(3, "1) Competition");
+    pros::lcd::set_text(4, "2) Skills");
+    pros::lcd::set_text(5, "3) Back");
+
+    // continue polling LCD buttons until one is pressed
+    INFO("waiting for match time category selection...");
+    while (0 == btn_press) {
+
+        // check if any LCD buttons have been pressed
+        btn_press = umbc::LCD::read_buttons();
+
+        // competition category selected
+        if (LCD_BTN_LEFT == btn_press) {
+            category = umbc::Robot::MatchType::TOURNAMENT;
+            INFO("competition selected for match time category");
+        }
+
+        // skills category selected
+        else if (LCD_BTN_CENTER == btn_press) {
+            category = umbc::Robot::MatchType::SKILLS;
+            INFO("skills selected for match time category");
+        }
+
+        // no category selected
+        else if (LCD_BTN_RIGHT == btn_press) {
+            category = umbc::Robot::MatchType::NONE;
+            INFO("back selected");
+        }
+
+        // no valid categories selected
+        else {
+            btn_press = 0;
+        }
+
+        // polling delay to not hog processor
+        pros::Task::delay(this->lcd_btn_polling_delay_ms);
+    }
+
+    // wait for the LCD button to be released
+    while (0 != umbc::LCD::read_buttons()) {
+        pros::Task::delay(this->lcd_btn_polling_delay_ms);
+    }
+
+    // clear the LCD
+    umbc::LCD::clear();
+
+    return category;
+}
+
+
+std::uint32_t umbc::Menu::menu_match_time(umbc::Robot::MatchType category) {
+
+    std::uint32_t match_time_s = this->robot->get_match_time(category);
+    bool save_selected = false;
+
+    // continue until save is pressed
+    INFO("waiting for match time selection...");
+    while (false == save_selected) {
+
+        // display the match time sub-menu on the LCD
+        umbc::LCD::clear();
+        pros::lcd::set_text(1, "Time: " + std::to_string(match_time_s) + " seconds");
+        pros::lcd::set_text(3, "1) +" + std::to_string(umbc::Robot::match_time_increment_s) + " seconds");
+        pros::lcd::set_text(4, "2) -" + std::to_string(umbc::Robot::match_time_increment_s) + " seconds");
+        pros::lcd::set_text(5, "3) Save");
+
+        // continue polling LCD buttons until one is pressed
+        std::uint8_t btn_press = 0;
+        while (0 == btn_press) {
+
+            // check if any LCD buttons have been pressed
+            btn_press = umbc::LCD::read_buttons();
+
+            // increase the match time without going above the maximum
+            if (LCD_BTN_LEFT == btn_press) {
+                if (umbc::Robot::match_time_max_s - umbc::Robot::match_time_increment_s >= match_time_s) {
+                    match_time_s += umbc::Robot::match_time_increment_s;
+                }
+                else {
+                    match_time_s = umbc::Robot::match_time_max_s;
+                }
+            }
+
+            // decrease the match time without going below the minimum
+            else if (LCD_BTN_CENTER == btn_press) {
+                if (umbc::Robot::match_time_min_s + umbc::Robot::match_time_increment_s <= match_time_s) {
+                    match_time_s -= umbc::Robot::match_time_increment_s;
+                }
+                else {
+                    match_time_s = umbc::Robot::match_time_min_s;
+                }
+            }
+
+            // save the match time
+            else if (LCD_BTN_RIGHT == btn_press) {
+                save_selected = true;
+                INFO("save selected for match time of " << match_time_s << " seconds");
+            }
+
+            // no valid selections made
+            else {
+                btn_press = 0;
+            }
+
+            // polling delay to not hog processor
+            pros::Task::delay(this->lcd_btn_polling_delay_ms);
+        }
+
+        // wait for the LCD button to be released
+        while (0 != umbc::LCD::read_buttons()) {
+            pros::Task::delay(this->lcd_btn_polling_delay_ms);
+        }
+    }
+
+    // clear the LCD
+    umbc::LCD::clear();
+
+    return match_time_s;
 }
 
 
@@ -525,6 +661,9 @@ void umbc::Menu::robot_menu() {
     // category currently being selected for on the autonomous sub-menus
     umbc::Robot::MatchType autonomous_category = umbc::Robot::MatchType::NONE;
 
+    // category currently being changed on the match time sub-menus
+    umbc::Robot::MatchType match_time_category = umbc::Robot::MatchType::NONE;
+
     // check to ensure the LCD has been initialized
     if (false == pros::lcd::is_initialized()) {
         ERROR("LCD is not initialized");
@@ -532,7 +671,7 @@ void umbc::Menu::robot_menu() {
     }
 
     // clear the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
 
     // continue until end of sub-menues
     while (umbc::Menu::SubMenu::NONE != current_sub_menu) {
@@ -614,6 +753,12 @@ void umbc::Menu::robot_menu() {
                     break;
                 }
 
+                // go to match time category sub-menu
+                if (umbc::Menu::Utility::SET_MATCH_TIME == utility) {
+                    current_sub_menu = umbc::Menu::SubMenu::MATCH_TIME_CATEGORY;
+                    break;
+                }
+
                 // go back to match type sub-menu
                 current_sub_menu = umbc::Menu::SubMenu::MATCH;
                 break;
@@ -659,10 +804,10 @@ void umbc::Menu::robot_menu() {
                     umbc::Robot::AutonomousType::PROGRAMMED, std::string());
 
                 // display the selection has been saved on the LCD
-                umbc::clear_lcd();
+                umbc::LCD::clear();
                 pros::lcd::set_text(1, "Selection Saved");
                 pros::Task::delay(MSG_DELAY_MS);
-                umbc::clear_lcd();
+                umbc::LCD::clear();
 
                 // go back to utilities sub-menu
                 current_sub_menu = umbc::Menu::SubMenu::UTILITIES;
@@ -673,7 +818,7 @@ void umbc::Menu::robot_menu() {
             case umbc::Menu::SubMenu::AUTONOMOUS_RECORDING: {
 
                 // select the recording for the category
-                std::string recording_name = this->menu_autonomous_recording();
+                std::string recording_name = this->menu_autonomous_recording(autonomous_category);
 
                 // go back to autonomous type sub-menu
                 if (recording_name.empty()) {
@@ -686,10 +831,45 @@ void umbc::Menu::robot_menu() {
                     umbc::Robot::AutonomousType::RECORDED, recording_name);
 
                 // display the selection has been saved on the LCD
-                umbc::clear_lcd();
+                umbc::LCD::clear();
                 pros::lcd::set_text(1, "Selection Saved");
                 pros::Task::delay(MSG_DELAY_MS);
-                umbc::clear_lcd();
+                umbc::LCD::clear();
+
+                // go back to utilities sub-menu
+                current_sub_menu = umbc::Menu::SubMenu::UTILITIES;
+                break;
+            }
+
+            // match time category sub-menu
+            case umbc::Menu::SubMenu::MATCH_TIME_CATEGORY: {
+
+                // select the category to change the match time for
+                match_time_category = this->menu_match_time_category();
+
+                // go back to utilities sub-menu
+                if (umbc::Robot::MatchType::NONE == match_time_category) {
+                    current_sub_menu = umbc::Menu::SubMenu::UTILITIES;
+                    break;
+                }
+
+                // continue to match time sub-menu
+                current_sub_menu = umbc::Menu::SubMenu::MATCH_TIME;
+                break;
+            }
+
+            // match time sub-menu
+            case umbc::Menu::SubMenu::MATCH_TIME: {
+
+                // change and save the match time for the category
+                std::uint32_t match_time_s = this->menu_match_time(match_time_category);
+                this->robot->set_match_time(match_time_category, match_time_s);
+
+                // display the match time has been saved on the LCD
+                umbc::LCD::clear();
+                pros::lcd::set_text(1, "Match Time Saved");
+                pros::Task::delay(MSG_DELAY_MS);
+                umbc::LCD::clear();
 
                 // go back to utilities sub-menu
                 current_sub_menu = umbc::Menu::SubMenu::UTILITIES;
@@ -705,12 +885,12 @@ void umbc::Menu::robot_menu() {
     }
 
     // display all required selections have been completed on the LCD
-    umbc::clear_lcd();
+    umbc::LCD::clear();
     pros::lcd::set_text(1, "Selection Complete");
     pros::Task::delay(MSG_DELAY_MS);
 
     // clear LCD menu
-    umbc::clear_lcd();
+    umbc::LCD::clear();
 
     INFO("menu selections completed");
 }

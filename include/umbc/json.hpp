@@ -151,6 +151,13 @@ namespace umbc {
             bool is_string() const;
 
             /**
+             * @brief Checks if this value is a JSON number
+             * 
+             * @return True if this value is a JSON number. Otherwise false
+             */
+            bool is_number() const;
+
+            /**
              * @brief Checks if an object member exists
              * 
              * @param name: Name of the member to check for
@@ -204,6 +211,22 @@ namespace umbc {
              * @param value: String value to set
              */
             void set_string(const std::string& value);
+
+            /**
+             * @brief Retrieves this value as a number
+             * 
+             * @param default_value: Value to return if this value is not a number
+             * 
+             * @return Number value if this value is a number. Otherwise the default value
+             */
+            double get_number(double default_value) const;
+
+            /**
+             * @brief Sets this value to a JSON number
+             * 
+             * @param value: Number value to set
+             */
+            void set_number(double value);
     };
 }
 
