@@ -7,6 +7,7 @@
 
 // standard libraries
 #include <iostream>
+#include <cstdlib>
 
 // local header files
 #include "main.h"
@@ -70,9 +71,10 @@ void disabled() {
 	umbc::LCD::clear();
 	pros::lcd::set_text(1, "Robot Disabled");
 
-	// stop the opcontrol task if it is currently active
-	if (true == robot.is_opcontrol_listed()) {
-		robot.opcontrol_stop();
+	// stop motors without changing solenoid outputs
+	if (false == robot.stop_outputs()) {
+		ERROR("could not stop all motors while disabling robot");
+		pros::lcd::set_text(3, "Motor Stop Failed!");
 	}
 
 	INFO("robot disabled");
@@ -147,9 +149,12 @@ void autonomous() {
  */
 void opcontrol() {
 
-	// stop the opcontrol task if it is currently active
-	if (true == robot.is_opcontrol_listed()) {
-		robot.opcontrol_stop();
+	// stop motors before displaying any training messages
+	if (false == robot.stop_outputs()) {
+		ERROR("cannot start opcontrol; could not stop all motors");
+		umbc::LCD::clear();
+		pros::lcd::set_text(1, "Motor Stop Failed!");
+		std::exit(EXIT_FAILURE);
 	}
 
 	// main opcontrol loop
@@ -190,14 +195,12 @@ void opcontrol() {
 
 			// train autonomous routine
 			pros::lcd::set_text(1, "Autonomous Training Active");
-			robot.train_autonomous(PARTNER_CONTROLLER);
-			umbc::LCD::clear();
-			pros::lcd::set_text(1, "Autonomous Training Complete");
-			INFO("autonomous training complete");
+			bool training_completed = robot.train_autonomous(PARTNER_CONTROLLER);
+			INFO("autonomous training ended; exiting program");
 			pros::Task::delay(MSG_DELAY_MS);
-			
-			// reinitialize robot settings
-			competition_initialize(); 
+
+			// PROS requests exit to the V5 Brain's program screen
+			std::exit(training_completed ? EXIT_SUCCESS : EXIT_FAILURE);
 		}
 		
 		// normal opcontrol mode

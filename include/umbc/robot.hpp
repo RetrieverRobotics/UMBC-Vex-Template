@@ -150,6 +150,27 @@ namespace umbc {
             // delay in milliseconds when continuously polling controller input
             static constexpr std::uint32_t opcontrol_delay_ms = 10; 
 
+            // first smart port on the V5 Brain
+            static constexpr std::uint8_t smart_port_first = 1;
+
+            // last smart port on the V5 Brain
+            static constexpr std::uint8_t smart_port_last = 21;
+
+            // first port on an ADI expander
+            static constexpr std::uint8_t adi_port_first = 1;
+
+            // last port on an ADI expander
+            static constexpr std::uint8_t adi_port_last = 8;
+
+            // first suffix used for a new autonomous recording
+            static constexpr std::uint32_t recording_number_first = 1;
+
+            // separator between an autonomous recording's base name and number
+            static constexpr char recording_number_separator = '-';
+
+            // motor voltage in millivolts used to stop a V5 motor
+            static constexpr std::int32_t motor_stop_voltage_mv = 0;
+
             umbc::Robot::MatchType match_type;          // current match type
             umbc::Robot::AllianceColor alliance_color;  // current alliance color
             umbc::Robot::Mode mode;                     // current mode
@@ -241,6 +262,32 @@ namespace umbc {
                 const std::string& recording_name, bool is_partner_controller);
 
             /**
+             * @brief Finds an unused recording name in the current match directory
+             *
+             * @return Numbered recording name with neither a master nor partner file.
+             *      Otherwise an empty string if the directory could not be read
+             */
+            std::string next_autonomous_name();
+
+            /**
+             * @brief Prompts the user to save or discard a recording
+             *
+             * @param recording_name: Unique name of the recording to save
+             *
+             * @return True if save was selected. Otherwise false
+             */
+            bool confirm_autonomous_save(const std::string& recording_name);
+
+            /**
+             * @brief Stops legacy PWM motors without changing solenoid outputs
+             *
+             * @param smart_port: Internal ADI port or smart port of an ADI expander
+             *
+             * @return True if all PWM motors were stopped. Otherwise false
+             */
+            bool stop_adi_motors(std::uint8_t smart_port);
+
+            /**
              * @brief Performs robot actions by playing back a recorded routine
              * 
              * Plays back a recorded routine that was created by training the robot using the
@@ -270,6 +317,17 @@ namespace umbc {
              * @note Implemented by the user in initialize.cpp
              */
             void initialize();
+
+            /**
+             * @brief Stops the opcontrol task and all connected V5 and ADI PWM motors
+             *
+             * @return True if all motor stop commands succeeded. Otherwise false
+             *
+             * @note Solenoid outputs are preserved to avoid moving cylinders.
+             *      Pneumatics remain pressurized. User-created tasks that control
+             *      actuators must also be stopped by the user before displaying menus.
+             */
+            bool stop_outputs();
 
             /**
              * @brief Sets controllers to use physical controllers
@@ -400,8 +458,11 @@ namespace umbc {
              * @param autonomous_type: Autonomous type to select
              * @param recording_name: Name of the recording to select. Ignored for
              *      programmed autonomous routines
+             *
+             * @return True if the selection was saved to the configuration file.
+             *      Otherwise false
             */
-            void set_autonomous(umbc::Robot::MatchType match_type,
+            bool set_autonomous(umbc::Robot::MatchType match_type,
                 umbc::Robot::AutonomousType autonomous_type, const std::string& recording_name);
 
             /**
@@ -503,11 +564,17 @@ namespace umbc {
              * @brief Trains an autonomous routine for either skills or a tournament match
              * 
              * Trains an autonomous routine for either skills or a tournament match through using opcontrol
-             * and the controller recorder.
+             * and the controller recorder. Stops motors before prompting to save to a
+             * unique numbered file or discard the recording. Solenoid outputs are preserved.
+             * Restores default LCD colors when recording stops.
+             * Displays time remaining in seconds using the configured match duration.
              * 
              * @param is_partner_controller: Set to true if the partner controller should be recorded
+             *
+             * @return True if the recording was saved and selected, or discarded.
+             *      Otherwise false, with the failure displayed on the LCD
              */
-            void train_autonomous(bool is_partner_controller);
+            bool train_autonomous(bool is_partner_controller);
 
             /**
              * @brief Starts opcontrol task

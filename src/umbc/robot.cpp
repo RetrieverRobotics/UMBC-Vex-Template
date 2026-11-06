@@ -7,8 +7,10 @@
  */
 
 // standard libraries
+#include <algorithm>
 #include <cstdint>
 #include <fstream>
+#include <limits>
 #include <sstream>
 #include <string>
 
@@ -153,20 +155,20 @@ std::string umbc::Robot::get_autonomous_name(umbc::Robot::MatchType match_type) 
 }
 
 
-void umbc::Robot::set_autonomous(umbc::Robot::MatchType match_type,
+bool umbc::Robot::set_autonomous(umbc::Robot::MatchType match_type,
     umbc::Robot::AutonomousType autonomous_type, const std::string& recording_name) {
 
     // check that the autonomous type is valid
     if (umbc::Robot::AutonomousType::RECORDED != autonomous_type
         && umbc::Robot::AutonomousType::PROGRAMMED != autonomous_type) {
         ERROR("cannot set autonomous selection; invalid autonomous type");
-        return;
+        return false;
     }
 
     // check that recorded routines have a recording name
     if (umbc::Robot::AutonomousType::RECORDED == autonomous_type && recording_name.empty()) {
         ERROR("cannot set autonomous selection; recorded routines require a recording name");
-        return;
+        return false;
     }
 
     // replace the previous selection for the match type
@@ -190,12 +192,12 @@ void umbc::Robot::set_autonomous(umbc::Robot::MatchType match_type,
 
         default: {
             ERROR("cannot set autonomous selection; invalid match type");
-            return;
+            return false;
         }
     }
 
     // save the selections so they persist between robot restarts
-    this->save_autonomous_selections();
+    return this->save_autonomous_selections();
 }
 
 
@@ -247,6 +249,10 @@ bool umbc::Robot::write_config_file(const Json& config) {
     }
     config_file << config.serialize();
     config_file.close();
+    if (config_file.fail()) {
+        ERROR("could not finish writing " + string(this->config_file_path));
+        return false;
+    }
 
     return true;
 }
@@ -755,7 +761,120 @@ void umbc::Robot::autonomous_recorded(const std::string& recording_name, bool is
 }
 
 
-void umbc::Robot::train_autonomous(bool is_partner_controller) {
+std::string umbc::Robot::next_autonomous_name() {
+
+    FileExplorer file_explorer = FileExplorer(this->get_autonomous_list_directory(this->match_type));
+    if (umbc::FileExplorer::Result::OK != file_explorer.go_to_root()) {
+        ERROR("cannot name autonomous recording; directory could not be read");
+        return std::string();
+    }
+
+    std::string base_name = (umbc::Robot::MatchType::SKILLS == this->match_type)
+        ? this->default_skills_autonomous_name : this->default_tournament_autonomous_name;
+    std::uint32_t recording_number = this->recording_number_first;
+
+    while (true) {
+
+        // reserve the number for both controllers, including orphaned partner files
+        std::string recording_name = base_name + this->recording_number_separator + std::to_string(recording_number);
+        if (false == file_explorer.is_file(recording_name + this->autonomous_file_extension)
+            && false == file_explorer.is_file(recording_name + this->autonomous_partner_suffix
+                + this->autonomous_file_extension)) {
+            return recording_name;
+        }
+
+        if (std::numeric_limits<std::uint32_t>::max() == recording_number) {
+            ERROR("cannot name autonomous recording; all recording numbers are in use");
+            return std::string();
+        }
+        ++recording_number;
+    }
+}
+
+
+bool umbc::Robot::confirm_autonomous_save(const std::string& recording_name) {
+
+    // wait for any previous touchscreen press to be released
+    while (0 != umbc::LCD::read_buttons()) {
+        pros::Task::delay(this->opcontrol_delay_ms);
+    }
+
+    umbc::LCD::clear();
+    pros::lcd::set_text(1, "Save Autonomous Recording?");
+    pros::lcd::set_text(2, recording_name + this->autonomous_file_extension);
+    pros::lcd::set_text(4, "1) Save");
+    pros::lcd::set_text(5, "2) Discard");
+
+    std::uint8_t btn_press = 0;
+    while (LCD_BTN_LEFT != btn_press && LCD_BTN_CENTER != btn_press) {
+
+        btn_press = umbc::LCD::read_buttons();
+        pros::Task::delay(this->opcontrol_delay_ms);
+    }
+
+    // consume the selection press before leaving the prompt
+    while (0 != umbc::LCD::read_buttons()) {
+        pros::Task::delay(this->opcontrol_delay_ms);
+    }
+
+    return LCD_BTN_LEFT == btn_press;
+}
+
+
+bool umbc::Robot::stop_adi_motors(std::uint8_t smart_port) {
+
+    bool result = true;
+
+    // preserve sensor configurations and pneumatic outputs while stopping PWM motors
+    for (std::uint8_t adi_port = this->adi_port_first; this->adi_port_last >= adi_port; ++adi_port) {
+
+        pros::adi_port_config_e_t config = pros::c::ext_adi_port_get_config(smart_port, adi_port);
+        if (pros::E_ADI_ERR == config) {
+            ERROR("could not read ADI configuration at " << (int)smart_port << ":" << (int)adi_port);
+            result = false;
+        }
+
+        else if (pros::E_ADI_LEGACY_PWM == config
+            && PROS_ERR == pros::c::ext_adi_motor_stop(smart_port, adi_port)) {
+            ERROR("could not stop ADI motor at " << (int)smart_port << ":" << (int)adi_port);
+            result = false;
+        }
+    }
+
+    return result;
+}
+
+
+bool umbc::Robot::stop_outputs() {
+
+    // stop the control task before clearing motor commands so it cannot reapply them
+    this->opcontrol_stop();
+    bool result = this->stop_adi_motors(INTERNAL_ADI_PORT);
+
+    for (std::uint8_t port = this->smart_port_first; this->smart_port_last >= port; ++port) {
+
+        pros::c::v5_device_e_t device_type = pros::c::get_plugged_type(port);
+        if (pros::c::E_DEVICE_MOTOR == device_type
+            && PROS_ERR == pros::c::motor_move_voltage(port, this->motor_stop_voltage_mv)) {
+            ERROR("could not stop V5 motor on port " << (int)port);
+            result = false;
+        }
+
+        else if (pros::c::E_DEVICE_ADI == device_type && false == this->stop_adi_motors(port)) {
+            result = false;
+        }
+
+        else if (pros::c::E_DEVICE_UNDEFINED == device_type) {
+            ERROR("could not read device type on port " << (int)port);
+            result = false;
+        }
+    }
+
+    return result;
+}
+
+
+bool umbc::Robot::train_autonomous(bool is_partner_controller) {
 
     INFO("autonomous training active");
 
@@ -780,23 +899,37 @@ void umbc::Robot::train_autonomous(bool is_partner_controller) {
         INFO("recording partner controller has begun");
     }
 
-    // wait for autonomous skills time to elapse
-    if (umbc::Robot::MatchType::SKILLS == this->match_type) {
-        INFO("setting task delay for skills autonomous time...");
-        pros::Task::delay(this->skills_autonomous_time_ms);
-        INFO("task delay set to " << this->skills_autonomous_time_ms << " ms");
-    }
-    
-    // wait for autonomous tournament time to elapse
-    else {
-        INFO("setting task delay for match autonomous time...");
-        pros::Task::delay(this->tournament_autonomous_time_ms);
-        INFO("task delay set to " << this->tournament_autonomous_time_ms << " ms");
+    // display time remaining until the configured recording duration elapses
+    std::uint32_t recording_time_ms = (umbc::Robot::MatchType::SKILLS == this->match_type)
+        ? this->skills_autonomous_time_ms : this->tournament_autonomous_time_ms;
+    std::uint32_t recording_start_ms = pros::millis();
+
+    while (true) {
+
+        std::uint32_t elapsed_ms = pros::millis() - recording_start_ms;
+        if (recording_time_ms <= elapsed_ms) {
+            break;
+        }
+
+        std::uint32_t remaining_ms = recording_time_ms - elapsed_ms;
+        std::uint32_t remaining_s = remaining_ms / this->ms_per_s;
+
+        // round up partial seconds so zero is not displayed while recording is active
+        if (0 != remaining_ms % this->ms_per_s) {
+            ++remaining_s;
+        }
+        pros::lcd::set_text(3, "Time Remaining: " + std::to_string(remaining_s) + " s");
+
+        // account for display time before delaying so the countdown does not accumulate drift
+        elapsed_ms = pros::millis() - recording_start_ms;
+        if (recording_time_ms > elapsed_ms) {
+            pros::Task::delay(std::min(this->ms_per_s, recording_time_ms - elapsed_ms));
+        }
     }
 
-    // terminate opcontrol task
+    // terminate opcontrol and stop motors before touchscreen interaction
     INFO("terminating opcontrol task...");
-    this->opcontrol_stop();
+    bool outputs_stopped = this->stop_outputs();
     INFO("opcontrol task has been terminated");
 
     // stop recording master controller inputs
@@ -811,36 +944,88 @@ void umbc::Robot::train_autonomous(bool is_partner_controller) {
         INFO("partner controller recording stopped");
     }
 
-    // determine the recording name to save the training as
-    std::string recording_name = (umbc::Robot::AutonomousType::RECORDED
-            == this->get_autonomous_type(this->match_type))
-        ? this->get_autonomous_name(this->match_type)
-        : ((umbc::Robot::MatchType::SKILLS == this->match_type)
-            ? string(this->default_skills_autonomous_name)
-            : string(this->default_tournament_autonomous_name));
+    // use the default LCD colors to signal that recording is no longer active
+    umbc::LCD::reset_colors();
+    umbc::LCD::clear();
+    if (false == outputs_stopped) {
+        ERROR("autonomous training failed; could not stop all motors");
+        pros::lcd::set_text(1, "Motor Stop Failed!");
+        pros::lcd::set_text(3, "Do not approach the robot.");
+        return false;
+    }
+
+    if (false == controller_recorder_master.isControllerInput()
+        || (true == is_partner_controller && false == controller_recorder_partner.isControllerInput())) {
+        ERROR("autonomous training failed; no controller input recorded");
+        pros::lcd::set_text(1, "No Recording To Save");
+        return false;
+    }
+
+    std::string recording_name = this->next_autonomous_name();
+    if (recording_name.empty()) {
+        pros::lcd::set_text(1, "Cannot Read Recording Folder");
+        return false;
+    }
+
+    if (false == this->confirm_autonomous_save(recording_name)) {
+        INFO("autonomous recording discarded");
+        umbc::LCD::clear();
+        pros::lcd::set_text(1, "Recording Discarded");
+        return true;
+    }
+
+    // refresh the directory after the prompt in case the SD card changed
+    FileExplorer file_explorer = FileExplorer(this->get_autonomous_list_directory(this->match_type));
+    if (umbc::FileExplorer::Result::OK != file_explorer.go_to_root()
+        || true == file_explorer.is_file(recording_name + this->autonomous_file_extension)
+        || true == file_explorer.is_file(recording_name + this->autonomous_partner_suffix
+            + this->autonomous_file_extension)) {
+        ERROR("cannot save autonomous recording; directory changed or name is already in use");
+        umbc::LCD::clear();
+        pros::lcd::set_text(1, "Recording Not Saved");
+        pros::lcd::set_text(3, "Folder changed or name in use");
+        return false;
+    }
 
     std::string file_path_master = this->autonomous_file_path(this->match_type, recording_name, false);
     std::string file_path_partner = this->autonomous_file_path(this->match_type, recording_name, true);
+    umbc::LCD::clear();
+    pros::lcd::set_text(1, "Saving Recording...");
 
     // save master controller file
     INFO("saving master controller file...");
     if (0 > controller_recorder_master.save(file_path_master.c_str())) {
         ERROR("autonomous training failed; could not save " + file_path_master);
-        return;
+        pros::lcd::set_text(1, "Recording Save Failed");
+        pros::lcd::set_text(3, "Check SD card space");
+        return false;
     }
     INFO("master controller file saved to " << file_path_master);
 
     // save partner controller file if needed
     if (true == is_partner_controller) {
         INFO("saving partner controller file...");
-        controller_recorder_partner.save(file_path_partner.c_str());
+        if (0 > controller_recorder_partner.save(file_path_partner.c_str())) {
+            ERROR("autonomous training failed; could not save " + file_path_partner);
+            pros::lcd::set_text(1, "Partner Save Failed");
+            pros::lcd::set_text(3, "Incomplete files; not selected");
+            return false;
+        }
         INFO("partner controller file saved to " << file_path_partner);
     }
 
     // select the new recording so it plays back during autonomous
-    this->set_autonomous(this->match_type, umbc::Robot::AutonomousType::RECORDED, recording_name);
+    if (false == this->set_autonomous(this->match_type, umbc::Robot::AutonomousType::RECORDED, recording_name)) {
+        ERROR("recording saved but could not save autonomous selection");
+        pros::lcd::set_text(1, "Recording Saved");
+        pros::lcd::set_text(3, "Selection Save Failed");
+        return false;
+    }
 
+    pros::lcd::set_text(1, "Recording Saved");
+    pros::lcd::set_text(3, recording_name + this->autonomous_file_extension);
     INFO("autonomous training complete");
+    return true;
 }
 
 
@@ -891,21 +1076,12 @@ void umbc::Robot::opcontrol_resume() {
 
 void umbc::Robot::opcontrol_stop() {
 
-    // get opcontrol task pointer
-    Task* t_opcontrol = this->t_opcontrol.get();
-    
-    // remove opcontrol task if it exists
-    if (nullptr != t_opcontrol) {
-        
-        try {
-            t_opcontrol->remove();
-            INFO(string(t_opcontrol_name) + " is stopped");
-        }
-        
-        catch (...) {
-            ERROR("failed to stop " + string(t_opcontrol_name));
-        }
+    if (true == this->is_opcontrol_listed()) {
+        this->t_opcontrol->remove();
+        INFO(string(t_opcontrol_name) + " is stopped");
     }
+
+    this->t_opcontrol.reset();
 }
 
 
