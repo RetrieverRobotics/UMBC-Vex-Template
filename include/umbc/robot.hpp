@@ -10,6 +10,7 @@
 #define _UMBC_ROBOT_HPP_
 
 #include "controller.hpp"
+#include "json.hpp"
 #include "pcontroller.hpp"
 #include "vcontroller.hpp"
 #include "api.h"
@@ -71,17 +72,32 @@ namespace umbc {
             };
 
             // directory where autonomous recordings are stored
-            static constexpr char* autonomous_directory = (char*)"/usd";
+            static constexpr char* autonomous_directory = (char*)"/usd/autonomous";
 
             // directory for listing autonomous recordings
             // (usd_list_files paths must not be prepended with /usd)
-            static constexpr char* autonomous_list_directory = (char*)"/";
+            static constexpr char* autonomous_list_directory = (char*)"/autonomous";
+
+            // sub-directory of the autonomous directory for competition recordings
+            static constexpr char* autonomous_competition_directory = (char*)"competition";
+
+            // sub-directory of the autonomous directory for skills recordings
+            static constexpr char* autonomous_skills_directory = (char*)"skills";
 
             // file extension for autonomous recordings
             static constexpr char* autonomous_file_extension = (char*)".auto";
 
             // suffix appended to a recording name for the partner controller recording
             static constexpr char* autonomous_partner_suffix = (char*)"-partner";
+
+            // amount of seconds the match time changes by when adjusted
+            static constexpr std::uint32_t match_time_increment_s = 5;
+
+            // minimum match time in seconds
+            static constexpr std::uint32_t match_time_min_s = 0;
+
+            // maximum match time in seconds
+            static constexpr std::uint32_t match_time_max_s = 3600;
 
         
         private:
@@ -119,11 +135,17 @@ namespace umbc {
             // autonomous type value for programmed routines in the configuration file
             static constexpr char* config_type_programmed = (char*)"programmed";
 
-            // amount of time in milliseconds for a practice, qualification and elimination match
-            static constexpr std::uint32_t tournament_autonomous_time_ms = 30000;
+            // name of the match time object in the configuration file
+            static constexpr char* config_name_match_time = (char*)"match_time";
 
-            // amount of time in milliseconds for an autonomous skills match
-            static constexpr std::uint32_t skills_autonomous_time_ms = 60000;
+            // default amount of time in milliseconds for a practice, qualification and elimination match
+            static constexpr std::uint32_t default_tournament_autonomous_time_ms = 30000;
+
+            // default amount of time in milliseconds for an autonomous skills match
+            static constexpr std::uint32_t default_skills_autonomous_time_ms = 60000;
+
+            // number of milliseconds in a second
+            static constexpr std::uint32_t ms_per_s = 1000;
 
             // delay in milliseconds when continuously polling controller input
             static constexpr std::uint32_t opcontrol_delay_ms = 10; 
@@ -131,6 +153,12 @@ namespace umbc {
             umbc::Robot::MatchType match_type;          // current match type
             umbc::Robot::AllianceColor alliance_color;  // current alliance color
             umbc::Robot::Mode mode;                     // current mode
+
+            // amount of time in milliseconds for a practice, qualification and elimination match
+            std::uint32_t tournament_autonomous_time_ms;
+
+            // amount of time in milliseconds for an autonomous skills match
+            std::uint32_t skills_autonomous_time_ms;
 
             // autonomous type selected for a tournament match
             umbc::Robot::AutonomousType competition_autonomous_type;
@@ -170,15 +198,47 @@ namespace umbc {
             static void robot_opcontrol(Robot* robot);
 
             /**
+             * @brief Reads and parses the configuration file
+             * 
+             * @param config: Json object to populate with the configuration. Reset to
+             *      a JSON null value if the configuration file could not be read
+             * 
+             * @return True if the configuration file was read successfully. Otherwise false
+             */
+            bool read_config_file(Json& config);
+
+            /**
+             * @brief Writes the configuration to the configuration file
+             * 
+             * @param config: Configuration to write
+             * 
+             * @return True if the configuration file was written successfully. Otherwise false
+             */
+            bool write_config_file(const Json& config);
+
+            /**
+             * @brief Checks if a match time is valid
+             * 
+             * @param match_time_s: Match time in seconds
+             * 
+             * @return True if the match time is within bounds and a multiple of the
+             *      match time increment. Otherwise false
+             */
+            static bool is_valid_match_time(std::uint32_t match_time_s);
+
+            /**
              * @brief Builds the file path for an autonomous recording
              * 
+             * @param match_type: Match type the recording is for
              * @param recording_name: Name of the recording
              * @param is_partner_controller: Set to true to build the path for the
              *      partner controller recording
              * 
-             * @return File path of the autonomous recording
+             * @return File path of the autonomous recording. Otherwise an empty
+             *      string for an invalid match type
              */
-            std::string autonomous_file_path(const std::string& recording_name, bool is_partner_controller);
+            std::string autonomous_file_path(umbc::Robot::MatchType match_type,
+                const std::string& recording_name, bool is_partner_controller);
 
             /**
              * @brief Performs robot actions by playing back a recorded routine
@@ -291,6 +351,45 @@ namespace umbc {
             std::string get_autonomous_name(umbc::Robot::MatchType match_type);
 
             /**
+             * @brief Retrieve the directory autonomous recordings are stored in for a match type
+             * 
+             * @param match_type: Match type of the recordings
+             * 
+             * @return Directory for file I/O of the recordings for the match type.
+             *      Otherwise an empty string for an invalid match type
+            */
+            static std::string get_autonomous_directory(umbc::Robot::MatchType match_type);
+
+            /**
+             * @brief Retrieve the directory for listing autonomous recordings for a match type
+             * 
+             * @param match_type: Match type of the recordings
+             * 
+             * @return Directory for listing the recordings for the match type with
+             *      FileExplorer. Otherwise an empty string for an invalid match type
+            */
+            static std::string get_autonomous_list_directory(umbc::Robot::MatchType match_type);
+
+            /**
+             * @brief Checks if the directory autonomous recordings are stored in exists for a match type
+             * 
+             * @param match_type: Match type of the recordings
+             * 
+             * @return True if the directory exists on the SD card. Otherwise false
+             * 
+             * @note Directories cannot be created by the robot because PROS does not
+             *      implement mkdir, so they must be created on the SD card from a computer.
+            */
+            static bool has_autonomous_directory(umbc::Robot::MatchType match_type);
+
+            /**
+             * @brief Logs a warning for each match type missing its autonomous directory
+             * 
+             * @return True if the autonomous directories exist for all match types. Otherwise false
+            */
+            bool check_autonomous_directories();
+
+            /**
              * @brief Set the autonomous selection for a match type and save it to the configuration file
              * 
              * Sets the autonomous selection for a match type, replacing the previous
@@ -311,9 +410,9 @@ namespace umbc {
              * Loads the autonomous selections from the configuration file on the SD card.
              * The current selections are kept for any selection that is missing or invalid.
              * 
-             * @return 1 if the configuration file was read successfully. Otherwise 0
+             * @return True if the configuration file was read successfully. Otherwise false
             */
-            std::int32_t load_autonomous_selections();
+            bool load_autonomous_selections();
 
             /**
              * @brief Saves the autonomous selections to the configuration file
@@ -321,9 +420,52 @@ namespace umbc {
              * Saves the autonomous selections to the configuration file on the SD card.
              * Unrelated values in the configuration file are preserved.
              * 
-             * @return 1 if the configuration file was saved successfully. Otherwise 0
+             * @return True if the configuration file was saved successfully. Otherwise false
             */
-            std::int32_t save_autonomous_selections();
+            bool save_autonomous_selections();
+
+            /**
+             * @brief Retrieve the match time for a match type
+             * 
+             * @param match_type: Match type of the match time
+             * 
+             * @return Match time in seconds for the match type. Otherwise 0 for an
+             *      invalid match type
+            */
+            std::uint32_t get_match_time(umbc::Robot::MatchType match_type);
+
+            /**
+             * @brief Set the match time for a match type and save it to the configuration file
+             * 
+             * Sets the match time for a match type and saves all match times to the
+             * configuration file so they persist between robot restarts.
+             * 
+             * @param match_type: Match type of the match time
+             * @param match_time_s: Match time in seconds. Must be a multiple of
+             *      umbc::Robot::match_time_increment_s between umbc::Robot::match_time_min_s
+             *      and umbc::Robot::match_time_max_s
+            */
+            void set_match_time(umbc::Robot::MatchType match_type, std::uint32_t match_time_s);
+
+            /**
+             * @brief Loads the match times from the configuration file
+             * 
+             * Loads the match times from the configuration file on the SD card.
+             * The default match time is used for any match time that is missing or invalid.
+             * 
+             * @return True if the configuration file was read successfully. Otherwise false
+            */
+            bool load_match_times();
+
+            /**
+             * @brief Saves the match times to the configuration file
+             * 
+             * Saves the match times to the configuration file on the SD card.
+             * Unrelated values in the configuration file are preserved.
+             * 
+             * @return True if the configuration file was saved successfully. Otherwise false
+            */
+            bool save_match_times();
 
             /**
              * @brief Performs robot actions for the selected autonomous routine

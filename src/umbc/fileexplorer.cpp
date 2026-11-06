@@ -5,6 +5,7 @@
  */
 
 // standard libraries
+#include <algorithm>
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
@@ -21,49 +22,43 @@ using namespace pros;
 using namespace umbc;
 using namespace std;
 
-namespace {
 
-    constexpr std::size_t initial_buffer_size = 512;
-    constexpr std::size_t maximum_buffer_size = 32768;
+std::string umbc::FileExplorer::normalize_path(const std::string& path) {
 
-    std::string normalize_path(const std::string& path) {
+    std::string normalized_path = path;
 
-        std::string normalized_path = path;
-
-        for (char& character : normalized_path) {
-            if ('\\' == character) {
-                character = '/';
-            }
+    for (char& character : normalized_path) {
+        if ('\\' == character) {
+            character = '/';
         }
-
-        while (1 < normalized_path.size() && '/' == normalized_path.back()) {
-            normalized_path.pop_back();
-        }
-
-        return normalized_path;
     }
 
-
-    std::string join_path(const std::string& directory_path, const std::string& name) {
-
-        if (directory_path.empty() || "/" == directory_path) {
-            return directory_path + name;
-        }
-
-        return directory_path + "/" + name;
+    while (1 < normalized_path.size() && '/' == normalized_path.back()) {
+        normalized_path.pop_back();
     }
 
+    return normalized_path;
+}
 
-    bool is_directory_name(const std::string& name) {
 
-        return !name.empty()
-            && "." != name
-            && ".." != name
-            && std::string::npos == name.find('/')
-            && std::string::npos == name.find('\\')
-            && std::string::npos == name.find('\0');
+std::string umbc::FileExplorer::join_path(const std::string& directory_path, const std::string& name) {
+
+    if (directory_path.empty() || "/" == directory_path) {
+        return directory_path + name;
     }
 
+    return directory_path + "/" + name;
+}
+
+
+bool umbc::FileExplorer::is_directory_name(const std::string& name) {
+
+    return !name.empty()
+        && "." != name
+        && ".." != name
+        && std::string::npos == name.find('/')
+        && std::string::npos == name.find('\\')
+        && std::string::npos == name.find('\0');
 }
 
 
@@ -252,16 +247,16 @@ std::int32_t umbc::FileExplorer::load_files(
         return EINVAL;
     }
 
-    std::size_t buffer_size = initial_buffer_size;
+    std::size_t buffer_size = this->initial_buffer_size;
     std::vector<char> buffer;
 
-    while (maximum_buffer_size >= buffer_size) {
+    while (this->maximum_buffer_size >= buffer_size) {
 
-        buffer.assign(buffer_size, '\x7f');
+        buffer.assign(buffer_size, this->buffer_fill_character);
         errno = 0;
 
         if (1 != pros::usd::list_files(directory_path.c_str(), buffer.data(), static_cast<std::int32_t>(buffer.size()))) {
-            if (ENOBUFS == errno && buffer_size < maximum_buffer_size) {
+            if (ENOBUFS == errno && buffer_size < this->maximum_buffer_size) {
                 buffer_size *= 2;
                 continue;
             }
@@ -274,8 +269,15 @@ std::int32_t umbc::FileExplorer::load_files(
 
         char* terminator = static_cast<char*>(std::memchr(buffer.data(), '\0', buffer.size()));
 
+        // the firmware leaves the buffer untouched when a directory contains no files
+        if (nullptr == terminator
+            && buffer.size() == static_cast<std::size_t>(std::count(buffer.begin(), buffer.end(), this->buffer_fill_character))) {
+            directory_files.clear();
+            return 0;
+        }
+
         if (nullptr == terminator) {
-            if (buffer_size == maximum_buffer_size) {
+            if (buffer_size == this->maximum_buffer_size) {
                 errno = ENOBUFS;
                 ERROR("file list exceeded the buffer limit for " + directory_path);
                 return ENOBUFS;

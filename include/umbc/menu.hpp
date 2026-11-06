@@ -41,7 +41,9 @@ namespace umbc {
                 UTILITIES = 3, // sub-menu for accessing robot utilities
                 AUTONOMOUS_CATEGORY = 4,  // sub-menu for selecting the autonomous selection category
                 AUTONOMOUS_TYPE = 5,      // sub-menu for selecting the autonomous type
-                AUTONOMOUS_RECORDING = 6  // sub-menu for selecting an autonomous recording
+                AUTONOMOUS_RECORDING = 6, // sub-menu for selecting an autonomous recording
+                MATCH_TIME_CATEGORY = 7,  // sub-menu for selecting the match time category
+                MATCH_TIME = 8            // sub-menu for changing the match time
             };
 
             /**
@@ -49,7 +51,8 @@ namespace umbc {
              */
             enum class Utility : std::int32_t {
                 NONE = -1,              // no utility
-                SELECT_AUTONOMOUS = 0   // utility for selecting autonomous routines
+                SELECT_AUTONOMOUS = 0,  // utility for selecting autonomous routines
+                SET_MATCH_TIME = 1      // utility for setting match times
             };
 
             // delay for when continuously polling LCD buttons in milliseconds
@@ -66,6 +69,9 @@ namespace umbc {
 
             // LCD line of the first recording displayed on the recording sub-menu
             static constexpr std::uint32_t recording_list_first_line = 3;
+
+            // LCD line of the options displayed on the recording sub-menu
+            static constexpr std::uint32_t options_line = 7;
         
             umbc::Robot* robot = nullptr;   // reference to robot being configured by the menu
 
@@ -118,13 +124,36 @@ namespace umbc {
             /**
              * @brief Menu to select an autonomous recording using the LLEMU
              * 
-             * Lists the autonomous recordings found at the root of the SD card
-             * for selection.
+             * Lists the autonomous recordings found in the category's autonomous
+             * directory on the SD card for selection.
+             * 
+             * @param category: Match type of the category being selected for
              * 
              * @returns Name of the recording that was selected. Otherwise an
              *      empty string
              */
-            std::string menu_autonomous_recording();
+            std::string menu_autonomous_recording(umbc::Robot::MatchType category);
+
+            /**
+             * @brief Menu to select the match time category using the LLEMU
+             * 
+             * @returns Match type of the category that was selected. Otherwise
+             *      umbc::Robot::MatchType::NONE
+             */
+            umbc::Robot::MatchType menu_match_time_category();
+
+            /**
+             * @brief Menu to change the match time using the LLEMU
+             * 
+             * Displays the current match time for the category, which can be
+             * decreased or increased by umbc::Robot::match_time_increment_s until
+             * save is selected.
+             * 
+             * @param category: Match type of the category being changed
+             * 
+             * @returns Match time in seconds that was saved
+             */
+            std::uint32_t menu_match_time(umbc::Robot::MatchType category);
 
 
         public:

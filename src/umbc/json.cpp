@@ -506,6 +506,11 @@ bool umbc::Json::is_string() const {
 }
 
 
+bool umbc::Json::is_number() const {
+    return Type::NUMBER == this->type;
+}
+
+
 bool umbc::Json::contains(const std::string& name) const {
     return nullptr != this->get(name);
 }
@@ -577,4 +582,17 @@ void umbc::Json::set_string(const std::string& value) {
     *this = Json();
     this->type = Type::STRING;
     this->string_value = value;
+}
+
+
+double umbc::Json::get_number(double default_value) const {
+    return (Type::NUMBER == this->type) ? this->number_value : default_value;
+}
+
+
+void umbc::Json::set_number(double value) {
+
+    *this = Json();
+    this->type = Type::NUMBER;
+    this->number_value = value;
 }

@@ -33,6 +33,15 @@ namespace umbc {
 
         private:
 
+            // initial size in bytes of the buffer used to list files
+            static constexpr std::size_t initial_buffer_size = 512;
+
+            // maximum size in bytes of the buffer used to list files
+            static constexpr std::size_t maximum_buffer_size = 32768;
+
+            // character the buffer used to list files is filled with to detect unwritten bytes
+            static constexpr char buffer_fill_character = '\x7f';
+
             std::string root_dir = std::string();       // root directory of the FileExplorer's file system
             std::string current_dir = std::string();    // current directory the FileExplorer is in
 
@@ -40,6 +49,35 @@ namespace umbc {
             std::map<std::string, std::string> files = std::map<std::string, std::string>();
 
             bool current_dir_valid = false;             // whether files were loaded from the current directory
+
+            /**
+             * @brief Converts backslashes to forward slashes and removes trailing slashes from a path
+             *
+             * @param path: Path to normalize
+             *
+             * @return Normalized path
+             */
+            static std::string normalize_path(const std::string& path);
+
+            /**
+             * @brief Joins a directory path and a name into a single path
+             *
+             * @param directory_path: Path of the directory
+             * @param name: Name of the file or directory within the directory
+             *
+             * @return Joined path
+             */
+            static std::string join_path(const std::string& directory_path, const std::string& name);
+
+            /**
+             * @brief Determines if a name is a valid name for a child directory
+             *
+             * @param name: Name being evaluated
+             *
+             * @return True if the name is not empty, is not . or .. and contains no path
+             *      separators or null characters. Otherwise false
+             */
+            static bool is_directory_name(const std::string& name);
 
             /**
              * @brief Loads the files at a directory into a map.

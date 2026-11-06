@@ -26,6 +26,8 @@ umbc::Robot::Robot() {
     this->match_type = umbc::Robot::MatchType::TOURNAMENT;
     this->alliance_color = umbc::Robot::AllianceColor::NONE;
     this->mode = umbc::Robot::Mode::COMPETITION;
+    this->tournament_autonomous_time_ms = this->default_tournament_autonomous_time_ms;
+    this->skills_autonomous_time_ms = this->default_skills_autonomous_time_ms;
     this->competition_autonomous_type = umbc::Robot::AutonomousType::RECORDED;
     this->competition_autonomous_name = this->default_tournament_autonomous_name;
     this->skills_autonomous_type = umbc::Robot::AutonomousType::RECORDED;
@@ -79,17 +81,17 @@ void umbc::Robot::update_lcd_colors() {
     switch (this->alliance_color) {
 
         case umbc::Robot::AllianceColor::RED: {
-            umbc::set_lcd_colors(pros::Color::red, pros::Color::white);
+            umbc::LCD::set_colors(pros::Color::red, pros::Color::white);
             break;
         }
 
         case umbc::Robot::AllianceColor::BLUE: {
-            umbc::set_lcd_colors(pros::Color::blue, pros::Color::white);
+            umbc::LCD::set_colors(pros::Color::blue, pros::Color::white);
             break;
         }
 
         case umbc::Robot::AllianceColor::NONE: {
-            umbc::reset_lcd_colors();
+            umbc::LCD::reset_colors();
             break;
         }
 
@@ -197,19 +199,21 @@ void umbc::Robot::set_autonomous(umbc::Robot::MatchType match_type,
 }
 
 
-std::int32_t umbc::Robot::load_autonomous_selections() {
+bool umbc::Robot::read_config_file(Json& config) {
+
+    config = Json();
 
     // check that an SD card is installed
     if (0 == pros::usd::is_installed()) {
-        WARN("cannot load autonomous selections; no SD card detected");
-        return 0;
+        WARN("cannot read " + string(this->config_file_path) + "; no SD card detected");
+        return false;
     }
 
     // open the configuration file for reading
     std::ifstream config_file(this->config_file_path);
     if (!config_file.good()) {
-        WARN("could not open " + string(this->config_file_path) + "; using default autonomous selections");
-        return 0;
+        WARN("could not open " + string(this->config_file_path));
+        return false;
     }
 
     // read in the entire configuration file
@@ -218,10 +222,43 @@ std::int32_t umbc::Robot::load_autonomous_selections() {
     config_file.close();
 
     // parse the configuration file
-    Json config;
     if (false == Json::parse(config_text.str(), config)) {
-        WARN("could not parse " + string(this->config_file_path) + "; using default autonomous selections");
-        return 0;
+        WARN("could not parse " + string(this->config_file_path));
+        return false;
+    }
+
+    return true;
+}
+
+
+bool umbc::Robot::write_config_file(const Json& config) {
+
+    // check that an SD card is installed
+    if (0 == pros::usd::is_installed()) {
+        ERROR("cannot write " + string(this->config_file_path) + "; no SD card detected");
+        return false;
+    }
+
+    // write the configuration file
+    std::ofstream config_file(this->config_file_path, std::ofstream::trunc);
+    if (!config_file.good()) {
+        ERROR("could not open " + string(this->config_file_path) + " for writing");
+        return false;
+    }
+    config_file << config.serialize();
+    config_file.close();
+
+    return true;
+}
+
+
+bool umbc::Robot::load_autonomous_selections() {
+
+    // read in the configuration file
+    Json config;
+    if (false == this->read_config_file(config)) {
+        WARN("using default autonomous selections");
+        return false;
     }
 
     // retrieve the autonomous selections object
@@ -229,7 +266,7 @@ std::int32_t umbc::Robot::load_autonomous_selections() {
     if (nullptr == autonomous) {
         WARN("no autonomous selections in " + string(this->config_file_path)
             + "; using default autonomous selections");
-        return 1;
+        return true;
     }
 
     // load the selection for each match type
@@ -295,32 +332,22 @@ std::int32_t umbc::Robot::load_autonomous_selections() {
         }
     }
 
-    return 1;
+    return true;
 }
 
 
-std::int32_t umbc::Robot::save_autonomous_selections() {
+bool umbc::Robot::save_autonomous_selections() {
 
     // check that an SD card is installed
     if (0 == pros::usd::is_installed()) {
         ERROR("cannot save autonomous selections; no SD card detected");
-        return 0;
+        return false;
     }
 
-    Json config;
-
     // read in the current configuration file to preserve unrelated values
-    std::ifstream config_file_in(this->config_file_path);
-    if (config_file_in.good()) {
-
-        std::stringstream config_text;
-        config_text << config_file_in.rdbuf();
-        config_file_in.close();
-
-        if (false == Json::parse(config_text.str(), config)) {
-            WARN("could not parse " + string(this->config_file_path) + "; recreating configuration file");
-            config = Json();
-        }
+    Json config;
+    if (false == this->read_config_file(config)) {
+        WARN("recreating " + string(this->config_file_path));
     }
 
     // update the selection for each match type
@@ -352,16 +379,164 @@ std::int32_t umbc::Robot::save_autonomous_selections() {
     }
 
     // write the configuration file
-    std::ofstream config_file_out(this->config_file_path, std::ofstream::trunc);
-    if (!config_file_out.good()) {
-        ERROR("could not open " + string(this->config_file_path) + " for writing");
-        return 0;
+    if (false == this->write_config_file(config)) {
+        ERROR("could not save autonomous selections");
+        return false;
     }
-    config_file_out << config.serialize();
-    config_file_out.close();
 
     INFO("autonomous selections saved to " + string(this->config_file_path));
-    return 1;
+    return true;
+}
+
+
+bool umbc::Robot::is_valid_match_time(std::uint32_t match_time_s) {
+    return match_time_s >= umbc::Robot::match_time_min_s
+        && match_time_s <= umbc::Robot::match_time_max_s
+        && 0 == (match_time_s % umbc::Robot::match_time_increment_s);
+}
+
+
+std::uint32_t umbc::Robot::get_match_time(umbc::Robot::MatchType match_type) {
+
+    switch (match_type) {
+
+        case umbc::Robot::MatchType::TOURNAMENT: {
+            return this->tournament_autonomous_time_ms / this->ms_per_s;
+        }
+
+        case umbc::Robot::MatchType::SKILLS: {
+            return this->skills_autonomous_time_ms / this->ms_per_s;
+        }
+
+        default: {
+            ERROR("cannot retrieve match time; invalid match type");
+            return 0;
+        }
+    }
+}
+
+
+void umbc::Robot::set_match_time(umbc::Robot::MatchType match_type, std::uint32_t match_time_s) {
+
+    // check that the match time is valid
+    if (false == this->is_valid_match_time(match_time_s)) {
+        ERROR("cannot set match time; invalid match time of " << match_time_s << " seconds");
+        return;
+    }
+
+    // replace the previous match time for the match type
+    switch (match_type) {
+
+        case umbc::Robot::MatchType::TOURNAMENT: {
+            this->tournament_autonomous_time_ms = match_time_s * this->ms_per_s;
+            break;
+        }
+
+        case umbc::Robot::MatchType::SKILLS: {
+            this->skills_autonomous_time_ms = match_time_s * this->ms_per_s;
+            break;
+        }
+
+        default: {
+            ERROR("cannot set match time; invalid match type");
+            return;
+        }
+    }
+
+    // save the match times so they persist between robot restarts
+    this->save_match_times();
+}
+
+
+bool umbc::Robot::load_match_times() {
+
+    // start from the default match times
+    this->tournament_autonomous_time_ms = this->default_tournament_autonomous_time_ms;
+    this->skills_autonomous_time_ms = this->default_skills_autonomous_time_ms;
+
+    // read in the configuration file
+    Json config;
+    if (false == this->read_config_file(config)) {
+        WARN("using default match times");
+        return false;
+    }
+
+    // retrieve the match time object
+    const Json* match_time = config.get(this->config_name_match_time);
+    if (nullptr == match_time) {
+        WARN("no match times in " + string(this->config_file_path) + "; using default match times");
+        return true;
+    }
+
+    // load the match time for each match type
+    const umbc::Robot::MatchType match_time_match_types[] =
+        {umbc::Robot::MatchType::TOURNAMENT, umbc::Robot::MatchType::SKILLS};
+    for (umbc::Robot::MatchType match_time_match_type : match_time_match_types) {
+
+        bool is_skills = (umbc::Robot::MatchType::SKILLS == match_time_match_type);
+        const char* match_time_name = is_skills ? this->config_name_skills : this->config_name_competition;
+
+        // retrieve the match time value for the match type
+        const Json* match_time_value = match_time->get(match_time_name);
+        if (nullptr == match_time_value || false == match_time_value->is_number()) {
+            WARN("no " + string(match_time_name) + " match time in "
+                + string(this->config_file_path) + "; using default match time");
+            continue;
+        }
+
+        // check that the match time is a valid whole number of seconds
+        double match_time_s = match_time_value->get_number(0.0);
+        if (false == (0.0 <= match_time_s && (double)this->match_time_max_s >= match_time_s)
+            || match_time_s != (double)((std::uint32_t)match_time_s)
+            || false == this->is_valid_match_time((std::uint32_t)match_time_s)) {
+            WARN("invalid " + string(match_time_name) + " match time in "
+                + string(this->config_file_path) + "; using default match time");
+            continue;
+        }
+
+        // apply the match time
+        if (true == is_skills) {
+            this->skills_autonomous_time_ms = (std::uint32_t)match_time_s * this->ms_per_s;
+        }
+        else {
+            this->tournament_autonomous_time_ms = (std::uint32_t)match_time_s * this->ms_per_s;
+        }
+        INFO(string(match_time_name) + " match time loaded as " << (std::uint32_t)match_time_s << " seconds");
+    }
+
+    return true;
+}
+
+
+bool umbc::Robot::save_match_times() {
+
+    // check that an SD card is installed
+    if (0 == pros::usd::is_installed()) {
+        ERROR("cannot save match times; no SD card detected");
+        return false;
+    }
+
+    // read in the current configuration file to preserve unrelated values
+    Json config;
+    if (false == this->read_config_file(config)) {
+        WARN("recreating " + string(this->config_file_path));
+    }
+
+    // update the match time for each match type
+    Json& match_time = config.insert(this->config_name_match_time);
+    match_time.insert(this->config_name_competition).set_number(
+        (double)(this->tournament_autonomous_time_ms / this->ms_per_s));
+    match_time.insert(this->config_name_skills).set_number(
+        (double)(this->skills_autonomous_time_ms / this->ms_per_s));
+
+    // write the configuration file
+    if (false == this->write_config_file(config)) {
+        ERROR("could not save match times");
+        return false;
+    }
+
+    INFO("match times saved to " + string(this->config_file_path));
+    return true;
 }
 
 
@@ -370,9 +545,97 @@ void umbc::Robot::robot_opcontrol(Robot* robot) {
 }
 
 
-std::string umbc::Robot::autonomous_file_path(const std::string& recording_name, bool is_partner_controller) {
+std::string umbc::Robot::get_autonomous_directory(umbc::Robot::MatchType match_type) {
 
-    std::string file_path = string(this->autonomous_directory) + "/" + recording_name;
+    switch (match_type) {
+
+        case umbc::Robot::MatchType::TOURNAMENT: {
+            return string(umbc::Robot::autonomous_directory) + "/" + umbc::Robot::autonomous_competition_directory;
+        }
+
+        case umbc::Robot::MatchType::SKILLS: {
+            return string(umbc::Robot::autonomous_directory) + "/" + umbc::Robot::autonomous_skills_directory;
+        }
+
+        default: {
+            ERROR("cannot retrieve autonomous directory; invalid match type");
+            return std::string();
+        }
+    }
+}
+
+
+std::string umbc::Robot::get_autonomous_list_directory(umbc::Robot::MatchType match_type) {
+
+    switch (match_type) {
+
+        case umbc::Robot::MatchType::TOURNAMENT: {
+            return string(umbc::Robot::autonomous_list_directory) + "/" + umbc::Robot::autonomous_competition_directory;
+        }
+
+        case umbc::Robot::MatchType::SKILLS: {
+            return string(umbc::Robot::autonomous_list_directory) + "/" + umbc::Robot::autonomous_skills_directory;
+        }
+
+        default: {
+            ERROR("cannot retrieve autonomous list directory; invalid match type");
+            return std::string();
+        }
+    }
+}
+
+
+bool umbc::Robot::has_autonomous_directory(umbc::Robot::MatchType match_type) {
+
+    // check that the match type has an autonomous directory
+    std::string list_directory = umbc::Robot::get_autonomous_list_directory(match_type);
+    if (list_directory.empty()) {
+        return false;
+    }
+
+    // check that the category directory is a child of the autonomous directory
+    std::size_t separator = list_directory.find_last_of('/');
+    FileExplorer file_explorer = FileExplorer(list_directory.substr(0, separator));
+    return file_explorer.is_directory(list_directory.substr(separator + 1));
+}
+
+
+bool umbc::Robot::check_autonomous_directories() {
+
+    // check that an SD card is installed
+    if (0 == pros::usd::is_installed()) {
+        WARN("cannot check autonomous directories; no SD card detected");
+        return false;
+    }
+
+    bool result = true;
+
+    // check that the competition autonomous directory exists
+    if (false == this->has_autonomous_directory(umbc::Robot::MatchType::TOURNAMENT)) {
+        WARN("competition autonomous directory is missing on the SD card");
+        result = false;
+    }
+
+    // check that the skills autonomous directory exists
+    if (false == this->has_autonomous_directory(umbc::Robot::MatchType::SKILLS)) {
+        WARN("skills autonomous directory is missing on the SD card");
+        result = false;
+    }
+
+    return result;
+}
+
+
+std::string umbc::Robot::autonomous_file_path(umbc::Robot::MatchType match_type,
+    const std::string& recording_name, bool is_partner_controller) {
+
+    // check that the match type has an autonomous directory
+    std::string directory = this->get_autonomous_directory(match_type);
+    if (directory.empty()) {
+        return std::string();
+    }
+
+    std::string file_path = directory + "/" + recording_name;
 
     // append the partner suffix for partner controller recordings
     if (true == is_partner_controller) {
@@ -423,11 +686,11 @@ void umbc::Robot::autonomous(bool is_partner_controller) {
 
 void umbc::Robot::autonomous_recorded(const std::string& recording_name, bool is_partner_controller) {
 
-    std::string file_path_master = this->autonomous_file_path(recording_name, false);
-    std::string file_path_partner = this->autonomous_file_path(recording_name, true);
+    std::string file_path_master = this->autonomous_file_path(this->match_type, recording_name, false);
+    std::string file_path_partner = this->autonomous_file_path(this->match_type, recording_name, true);
 
     // check that the recording exists
-    FileExplorer file_explorer = FileExplorer(this->autonomous_list_directory);
+    FileExplorer file_explorer = FileExplorer(this->get_autonomous_list_directory(this->match_type));
     if (false == file_explorer.is_file(recording_name + this->autonomous_file_extension)) {
         ERROR("cannot play back recorded autonomous; " + file_path_master + " does not exist");
         pros::lcd::set_text(3, "Recording Not Found");
@@ -556,12 +819,15 @@ void umbc::Robot::train_autonomous(bool is_partner_controller) {
             ? string(this->default_skills_autonomous_name)
             : string(this->default_tournament_autonomous_name));
 
-    std::string file_path_master = this->autonomous_file_path(recording_name, false);
-    std::string file_path_partner = this->autonomous_file_path(recording_name, true);
+    std::string file_path_master = this->autonomous_file_path(this->match_type, recording_name, false);
+    std::string file_path_partner = this->autonomous_file_path(this->match_type, recording_name, true);
 
     // save master controller file
     INFO("saving master controller file...");
-    controller_recorder_master.save(file_path_master.c_str());
+    if (0 > controller_recorder_master.save(file_path_master.c_str())) {
+        ERROR("autonomous training failed; could not save " + file_path_master);
+        return;
+    }
     INFO("master controller file saved to " << file_path_master);
 
     // save partner controller file if needed

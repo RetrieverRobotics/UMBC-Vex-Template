@@ -42,6 +42,12 @@ void initialize() {
 	// load autonomous selections from the configuration file
 	robot.load_autonomous_selections();
 
+	// load match times from the configuration file
+	robot.load_match_times();
+
+	// warn about autonomous directories missing on the SD card
+	robot.check_autonomous_directories();
+
 	// perform user program initialization
 	robot.initialize();
 
@@ -61,7 +67,7 @@ void disabled() {
 	INFO("disabling robot...");
 
 	// display disabled message on the LLEMU
-	umbc::clear_lcd();
+	umbc::LCD::clear();
 	pros::lcd::set_text(1, "Robot Disabled");
 
 	// stop the opcontrol task if it is currently active
@@ -89,7 +95,7 @@ void competition_initialize() {
 	INFO("performing competition initialization...");
 
 	// display robot menu on the LLEMU for selecting match type, mode and alliance color
-	umbc::clear_lcd();
+	umbc::LCD::clear();
 	Menu menu = Menu(&robot);
 	menu.robot_menu();
 
@@ -115,10 +121,10 @@ void autonomous() {
 	INFO("performing autonomous routine...");
 
 	// perform selected autonomous routine
-	umbc::clear_lcd();
+	umbc::LCD::clear();
 	pros::lcd::set_text(1, "Autonomous Active");
 	robot.autonomous(PARTNER_CONTROLLER);
-	umbc::clear_lcd();
+	umbc::LCD::clear();
 	
 	INFO("autonomous routine completed");
 }
@@ -149,7 +155,7 @@ void opcontrol() {
 	// main opcontrol loop
 	while (true) {
 
-		umbc::clear_lcd();
+		umbc::LCD::clear();
 
 		// set robot controllers to physical controllers
 		INFO("setting robot controllers to physical controllers...");
@@ -164,17 +170,28 @@ void opcontrol() {
 			// check that an SD card is installed
 			if (0 == pros::usd::is_installed()) {
 				ERROR("autonomous training failed; no SD Card detected");
-				umbc::clear_lcd();
+				umbc::LCD::clear();
 				pros::lcd::set_text(1, "No SD Card Detected!");
 				pros::lcd::set_text(3, "Power off V5 Brain and insert");
 				pros::lcd::set_text(4, "SD Card.");
 				return;
 			}
 
+			// check that the autonomous directory for the match type exists
+			if (false == umbc::Robot::has_autonomous_directory(robot.get_match_type())) {
+				std::string directory = umbc::Robot::get_autonomous_list_directory(robot.get_match_type());
+				ERROR("autonomous training failed; " + directory + " is missing on the SD card");
+				umbc::LCD::clear();
+				pros::lcd::set_text(1, "Missing Autonomous Folder!");
+				pros::lcd::set_text(3, "Create " + directory);
+				pros::lcd::set_text(4, "on SD Card.");
+				return;
+			}
+
 			// train autonomous routine
 			pros::lcd::set_text(1, "Autonomous Training Active");
 			robot.train_autonomous(PARTNER_CONTROLLER);
-			umbc::clear_lcd();
+			umbc::LCD::clear();
 			pros::lcd::set_text(1, "Autonomous Training Complete");
 			INFO("autonomous training complete");
 			pros::Task::delay(MSG_DELAY_MS);
