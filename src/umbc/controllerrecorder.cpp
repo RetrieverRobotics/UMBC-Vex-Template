@@ -184,11 +184,14 @@ std::int32_t umbc::ControllerRecorder::save(const char* file_path) {
         this->controller_input.pop();
     }
 
-    INFO("controller input written to " + file_path_str);
-    
     // close the file
     file.close();
+    if (file.fail()) {
+        ERROR("failed to close " + file_path_str);
+        return -1;
+    }
 
+    INFO("controller input written to " + file_path_str);
     return number_of_controller_inputs;
 }
 
@@ -247,15 +250,9 @@ void umbc::ControllerRecorder::stop() {
 
     // check if the task exists before trying to remove it
     if (nullptr != t_record) {
-        
-        try {
-            t_record->remove();
-            INFO(string(t_record_controller_input_name) + " is stopped");
-        }
-        
-        catch (...) {
-            ERROR("failed to stop " + string(t_record_controller_input_name));
-        }
+        t_record->remove();
+        this->t_record_controller_input.reset();
+        INFO(string(t_record_controller_input_name) + " is stopped");
     }
 }
 
